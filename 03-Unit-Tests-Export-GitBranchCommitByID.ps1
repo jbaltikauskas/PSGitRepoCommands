@@ -68,203 +68,28 @@ Param (
 $ErrorActionPreference = 'Stop'
 $PSNativeCommandUseErrorActionPreference = $true
 
-function Write-Section () {
-    <#
-    .SYNOPSIS
-        Writes a yellow section banner to the host.
-
-    .DESCRIPTION
-        Prints blank lines, gray rules, and a cyan titled message for multi-step scripts.
-
-    .PARAMETER message
-        Section title text.
-
-    .NOTES
-        1. Write blank line, gray horizontal rules, and cyan titled message.
-
-    .EXAMPLE
-        PS> Write-Section -message 'Import module'
-        Prints a titled banner for the import phase.
-
-        PS> Write-Section -message 'Cleanup'
-        Prints a titled banner for cleanup.
-    #>
-    [CmdletBinding()]
-    Param (
-        [Parameter(Mandatory = $true, Position = 0, HelpMessage = "Section title.")]
-        [ValidateNotNullOrEmpty()]
-        [string]$message
-    )
-
-    Begin {
-        $PSBoundParameters | Out-String | Write-Host
-    }
-
-    Process {
-
-        Write-Host ''
-        Write-Host ('=' * 60) -ForegroundColor DarkGray
-        Write-Host $message -ForegroundColor Cyan
-        Write-Host ('=' * 60) -ForegroundColor DarkGray
-    }
-}
-
-function Assert-TestTrue () {
-    <#
-    .SYNOPSIS
-        Throws when a test condition is false.
-
-    .DESCRIPTION
-        Evaluates Condition; on failure throws with Label (and optional Details)
-        so the top-level catch can report which assertion failed. On success
-        writes a green PASS line and optional Details in DarkGray.
-
-    .PARAMETER condition
-        Boolean result that must be true.
-
-    .PARAMETER label
-        Short name of the assertion for error messages.
-
-    .PARAMETER details
-        Optional extra context shown on pass and included in the throw message.
-
-    .NOTES
-        1. Throw when Condition is false (include Details when provided).
-        2. Write a green pass line when Condition is true; echo Details if set.
-
-    .EXAMPLE
-        PS> Assert-TestTrue -condition $true -label 'sanity'
-        Writes a green pass line.
-
-        PS> Assert-TestTrue -condition $true -label 'has b.txt' -details 'Files=a.txt, b.txt'
-        Writes PASS plus the details line.
-    #>
-    [CmdletBinding()]
-    Param (
-        [Parameter(Mandatory = $true, HelpMessage = "Value that must be true.")]
-        [bool]$condition,
-
-        [Parameter(Mandatory = $true, HelpMessage = "Assertion label.")]
-        [ValidateNotNullOrEmpty()]
-        [string]$label,
-
-        [Parameter(Mandatory = $false, HelpMessage = "Optional context for pass/fail output.")]
-        [string]$details
-    )
-
-    Begin {
-        $PSBoundParameters | Out-String | Write-Host
-    }
-
-    Process {
-
-        if (-not $condition) {
-            if ([string]::IsNullOrWhiteSpace($details)) {
-                throw "Assertion failed: $label"
-            }
-
-            throw "Assertion failed: $label | $details"
-        }
-
-        Write-Host "PASS: $label" -ForegroundColor Green
-
-        if (-not [string]::IsNullOrWhiteSpace($details)) {
-            Write-Host ("  {0}" -f $details) -ForegroundColor DarkGray
-        }
-    }
-}
-
-function New-TestRunFolder () {
-    <#
-    .SYNOPSIS
-        Creates a dated folder under ParentPath for one smoke-test run.
-
-    .DESCRIPTION
-        Ensures ParentPath exists, then creates a child directory named
-        yyyyMMdd-HHmm (local time). If that name already exists, appends
-        seconds as yyyyMMdd-HHmmss. Returns the resolved folder path.
-        Does not touch sibling content such as tests/Github/DbUp.
-
-    .PARAMETER parentPath
-        Parent directory, typically tests/.
-
-    .NOTES
-        1. Resolve ParentPath and create it when missing.
-        2. Build yyyyMMdd-HHmm; fall back to yyyyMMdd-HHmmss on collision.
-        3. Create the folder and return its full path.
-
-    .EXAMPLE
-        PS> New-TestRunFolder -parentPath '.\tests'
-        Creates tests\20260921-0013 (or similar) and returns that path.
-
-        PS> $run = New-TestRunFolder -parentPath $repoPath
-        Stores the dated run folder path in $run.
-    #>
-    [CmdletBinding()]
-    Param (
-        [Parameter(Mandatory = $true, HelpMessage = "Parent folder, typically tests/.")]
-        [ValidateNotNullOrEmpty()]
-        [string]$parentPath
-    )
-
-    Begin {
-        $PSBoundParameters | Out-String | Write-Host
-    }
-
-    Process {
-
-        [string]$resolvedParent = [System.IO.Path]::GetFullPath($parentPath)
-
-        if (-not (Test-Path -LiteralPath $resolvedParent)) {
-            New-Item -ItemType Directory -Path $resolvedParent | Out-Null
-        }
-
-        [string]$stamp = Get-Date -Format 'yyyyMMdd-HHmm'
-        [string]$runPath = Join-Path -Path $resolvedParent -ChildPath $stamp
-
-        if (Test-Path -LiteralPath $runPath) {
-            $stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
-            $runPath = Join-Path -Path $resolvedParent -ChildPath $stamp
-        }
-
-        if (Test-Path -LiteralPath $runPath) {
-            throw "Test run folder already exists: $runPath"
-        }
-
-        New-Item -ItemType Directory -Path $runPath | Out-Null
-        return [System.IO.Path]::GetFullPath($runPath)
-    }
-}
+. (Join-Path -Path $PSScriptRoot -ChildPath '.ps-UnitTests\PSUnitTests.ps1')
 
 [string]$resolvedModulePath = [System.IO.Path]::GetFullPath($modulePath)
 [string]$resolvedRepoPath = $null
-[string]$libraryPath = Join-Path -Path ([System.IO.Path]::GetFullPath($repoPath)) -ChildPath 'Github\DbUp'
+[string]$libraryPath = $null
 
 try {
 
-    Write-Host 'BEGIN: Settings' -ForegroundColor Yellow
-    Write-Host ("modulePath         = {0}" -f $modulePath) -ForegroundColor DarkGray
-    Write-Host ("resolvedModulePath = {0}" -f $resolvedModulePath) -ForegroundColor DarkGray
-    Write-Host ("repoPath           = {0}" -f $repoPath) -ForegroundColor DarkGray
-    Write-Host ("libraryPath        = {0}" -f $libraryPath) -ForegroundColor DarkGray
-    Write-Host ("noPause            = {0}" -f $noPause.IsPresent) -ForegroundColor DarkGray
-    Write-Host ("keepTempRepo       = {0}" -f $keepTempRepo) -ForegroundColor DarkGray
-    $PSBoundParameters | Out-String | Write-Host
-    Write-Host 'END: Settings' -ForegroundColor Yellow
+    $libraryPath = Get-TestLibraryPath -repoPath $repoPath
 
-    if (-not (Test-Path -LiteralPath $resolvedModulePath)) {
-        throw "PSGitRepoCommands manifest not found: $resolvedModulePath"
-    }
-
-    if (-not (Test-Path -LiteralPath $libraryPath -PathType Container)) {
-        throw "DbUp repository not found: $libraryPath"
-    }
+    Write-TestSettings -values ([ordered]@{
+            modulePath         = $modulePath
+            resolvedModulePath = $resolvedModulePath
+            repoPath           = $repoPath
+            libraryPath        = $libraryPath
+            noPause            = $noPause.IsPresent
+            keepTempRepo       = $keepTempRepo
+        }) -boundParameters $PSBoundParameters
 
     Write-Section -message 'Import PSGitRepoCommands'
-    Import-Module -Name $resolvedModulePath -Force
-
-    Assert-TestTrue -condition ($null -ne (Get-Command -Module PSGitRepoCommands -Name 'Get-GitBranchCommitByID' -ErrorAction SilentlyContinue)) -label 'Get-GitBranchCommitByID is exported'
-    Assert-TestTrue -condition ($null -ne (Get-Command -Module PSGitRepoCommands -Name 'Export-GitBranchCommitByID' -ErrorAction SilentlyContinue)) -label 'Export-GitBranchCommitByID is exported'
+    Import-TestModule -modulePath $resolvedModulePath
+    Assert-TestCommandExported -name 'Get-GitBranchCommitByID', 'Export-GitBranchCommitByID'
 
     Write-Section -message 'Create dated test folder under tests/'
     $resolvedRepoPath = New-TestRunFolder -parentPath $repoPath
@@ -326,30 +151,14 @@ try {
     Assert-TestTrue -condition ($exportJson.Commit.Author -eq 'Robert Wagner' -and $exportJson.Commit.AuthorEmail -eq 'robert@wagner.id.au' -and $exportJson.Commit.AuthorDate -eq '2026-02-18T13:55:32+10:00' -and $exportJson.Commit.Committer -eq 'Robert Wagner') -label 'commit export JSON stores the real DbUp tip identity'
 
     Write-Section -message 'Cleanup'
-    if ($keepTempRepo) {
-        Write-Host ("Keeping dated test folder: {0}" -f $resolvedRepoPath) -ForegroundColor Yellow
-    }
-    else {
-        Remove-Item -LiteralPath $resolvedRepoPath -Recurse -Force
-        Write-Host 'Removed dated test folder under tests/.' -ForegroundColor Green
+    Complete-TestRunFolder -repoPath $resolvedRepoPath -keep $keepTempRepo
+    if (-not $keepTempRepo) {
         $resolvedRepoPath = $null
     }
 }
 catch {
 
-    Write-Host ''
-    Write-Host 'Script failed to execute.' -ForegroundColor Red
-    Write-Host ("Exception: {0}" -f $_.Exception.GetType().FullName) -ForegroundColor Red
-    Write-Host ("Message:   {0}" -f $_.Exception.Message) -ForegroundColor Red
-
-    if (-not [string]::IsNullOrWhiteSpace($resolvedRepoPath)) {
-        Write-Host ("Nested test folder left at: {0}" -f $resolvedRepoPath) -ForegroundColor Yellow
-    }
-
-    if (-not $noPause.IsPresent) {
-        Read-Host 'Press Enter to close'
-    }
-
+    Write-TestScriptFailure -errorRecord $_ -leftPath $resolvedRepoPath -pause (-not $noPause.IsPresent)
     exit 1
 }
 
