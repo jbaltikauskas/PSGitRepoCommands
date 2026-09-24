@@ -1,0 +1,3 @@
+[submodule "tests/DbUp"]
+	path = tests/DbUp
+	url = https://github.com/DbUp/DbUp.git
