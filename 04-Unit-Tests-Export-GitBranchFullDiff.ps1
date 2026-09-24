@@ -7,10 +7,10 @@
     2. Print BEGIN/END Settings including bound parameters and resolved paths.
     3. Import the module with -Force.
     4. Create a dated folder under tests/ named yyyyMMdd-HHmm for the JSON export.
-    5. Resolve the newest release/* branch in tests/DbUp.
+    5. Resolve the newest release/* branch in tests/Github/DbUp.
     6. Write Export-GitBranchFullDiff JSON for that release versus main into the dated folder.
     7. Remove that dated folder when -keepTempRepo:$false is passed.
-       The DbUp submodule under tests/ is left untouched.
+       The DbUp submodule under tests/Github/ is left untouched.
 
 .PARAMETER modulePath
     Path to PSGitRepoCommands.psd1. Defaults to .ps\PSGitRepoCommands\PSGitRepoCommands.psd1
@@ -34,7 +34,7 @@
     None. Writes progress to the host; exits 0 on success or 1 on failure.
 
 .NOTES
-    Requires PowerShell 7.2+ and git on PATH. Reads tests/DbUp and writes JSON
+    Requires PowerShell 7.2+ and git on PATH. Reads tests/Github/DbUp and writes JSON
     only into the dated folder under tests/.
 
 .EXAMPLE
@@ -182,7 +182,7 @@ function New-TestRunFolder () {
         Ensures ParentPath exists, then creates a child directory named
         yyyyMMdd-HHmm (local time). If that name already exists, appends
         seconds as yyyyMMdd-HHmmss. Returns the resolved folder path.
-        Does not touch sibling content such as DbUp.
+        Does not touch sibling content such as tests/Github/DbUp.
 
     .PARAMETER parentPath
         Parent directory, typically tests/.
@@ -246,7 +246,7 @@ function Get-LastReleaseBranch () {
         version:refname order). Throws when no release branch exists.
 
     .PARAMETER path
-        Repository that contains release branches (for example tests/DbUp).
+        Repository that contains release branches (for example tests/Github/DbUp).
 
     .NOTES
         1. List release refs sorted by version descending.
@@ -254,7 +254,7 @@ function Get-LastReleaseBranch () {
         3. Return the first unique name, or throw.
 
     .EXAMPLE
-        PS> Get-LastReleaseBranch -path '.\tests\DbUp'
+        PS> Get-LastReleaseBranch -path '.\tests\Github\DbUp'
         Returns release/6.0.0 when that is the newest release branch.
 
         PS> $name = Get-LastReleaseBranch -path $libraryPath
@@ -312,7 +312,7 @@ function Get-LastReleaseBranch () {
 
 [string]$resolvedModulePath = [System.IO.Path]::GetFullPath($modulePath)
 [string]$resolvedRepoPath = $null
-[string]$libraryPath = Join-Path -Path ([System.IO.Path]::GetFullPath($repoPath)) -ChildPath 'DbUp'
+[string]$libraryPath = Join-Path -Path ([System.IO.Path]::GetFullPath($repoPath)) -ChildPath 'Github\DbUp'
 
 try {
 

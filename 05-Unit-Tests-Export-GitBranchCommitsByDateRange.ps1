@@ -1,16 +1,16 @@
 <#
 .SYNOPSIS
-    Smoke-tests commit lookup by author-date range against tests/DbUp.
+    Smoke-tests commit lookup by author-date range against tests/Github/DbUp.
 
 .DESCRIPTION
     1. Resolve the PSGitRepoCommands manifest path (default under this repo).
     2. Print BEGIN/END Settings including bound parameters and resolved paths.
     3. Import the module with -Force.
     4. Create a dated folder under tests/ named yyyyMMdd-HHmm for the JSON export.
-    5. Read commits on tests/DbUp main for 2026-02-18, then again with author and email filters.
+    5. Read commits on tests/Github/DbUp main for 2026-02-18, then again with author and email filters.
     6. Assert the newest commit identity and write the date-range export JSON into that dated folder.
     7. Remove that dated folder when -keepTempRepo:$false is passed.
-       The DbUp submodule under tests/ is left untouched.
+       The DbUp submodule under tests/Github/ is left untouched.
 
 .PARAMETER modulePath
     Path to PSGitRepoCommands.psd1. Defaults to .ps\PSGitRepoCommands\PSGitRepoCommands.psd1
@@ -34,7 +34,7 @@
     None. Writes progress to the host; exits 0 on success or 1 on failure.
 
 .NOTES
-    Requires PowerShell 7.2+ and git on PATH. Reads tests/DbUp and writes JSON
+    Requires PowerShell 7.2+ and git on PATH. Reads tests/Github/DbUp and writes JSON
     only into the dated folder under tests/.
 
 .EXAMPLE
@@ -182,7 +182,7 @@ function New-TestRunFolder () {
         Ensures ParentPath exists, then creates a child directory named
         yyyyMMdd-HHmm (local time). If that name already exists, appends
         seconds as yyyyMMdd-HHmmss. Returns the resolved folder path.
-        Does not touch sibling content such as DbUp.
+        Does not touch sibling content such as tests/Github/DbUp.
 
     .PARAMETER parentPath
         Parent directory, typically tests/.
@@ -237,7 +237,7 @@ function New-TestRunFolder () {
 
 [string]$resolvedModulePath = [System.IO.Path]::GetFullPath($modulePath)
 [string]$resolvedRepoPath = $null
-[string]$libraryPath = Join-Path -Path ([System.IO.Path]::GetFullPath($repoPath)) -ChildPath 'DbUp'
+[string]$libraryPath = Join-Path -Path ([System.IO.Path]::GetFullPath($repoPath)) -ChildPath 'Github\DbUp'
 
 try {
 

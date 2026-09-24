@@ -14,7 +14,7 @@
        short hash and a dash (<short>-work-items.json/.patch,
        <short>-commit-export.json/.patch, <target tip short>-diff-export.json/.patch).
     8. Remove that dated folder when -keepTempRepo:$false is passed.
-       The DbUp submodule under tests/ is left untouched.
+       The DbUp submodule under tests/Github/ is left untouched.
 
 .PARAMETER modulePath
     Path to PSGitRepoCommands.psd1. Defaults to .ps\PSGitRepoCommands\PSGitRepoCommands.psd1
@@ -186,7 +186,7 @@ function New-TestRunFolder () {
         Ensures ParentPath exists, then creates a child directory named
         yyyyMMdd-HHmm (local time). If that name already exists, appends
         seconds as yyyyMMdd-HHmmss. Returns the resolved folder path.
-        Does not touch sibling content such as DbUp.
+        Does not touch sibling content such as tests/Github/DbUp.
 
     .PARAMETER parentPath
         Parent directory, typically tests/.
@@ -247,7 +247,7 @@ function Initialize-TestGitRepository () {
     .DESCRIPTION
         Ensures RepoPath exists, replaces any prior nested .git at that path,
         then creates main with a.txt and feature/x with b.txt. Returns the
-        resolved Git root. Does not delete sibling content such as DbUp.
+        resolved Git root. Does not delete sibling content such as tests/Github/DbUp.
         Throws when git commands fail or the nested toplevel is wrong.
 
     .PARAMETER repoPath
@@ -371,7 +371,7 @@ function Clear-TestGitRepository () {
     .DESCRIPTION
         Deletes the dated run folder (RepoPath) created for this smoke test,
         including its .git directory and fixture files. Does not delete the
-        parent tests/ folder or siblings such as DbUp.
+        parent tests/ folder or siblings such as tests/Github/DbUp.
 
     .PARAMETER repoPath
         Nested Git root created for smoke tests.
@@ -419,7 +419,7 @@ function Get-LastReleaseBranch () {
         version:refname order). Throws when no release branch exists.
 
     .PARAMETER path
-        Repository that contains release branches (for example tests/DbUp).
+        Repository that contains release branches (for example tests/Github/DbUp).
 
     .NOTES
         1. List release refs sorted by version descending.
@@ -427,7 +427,7 @@ function Get-LastReleaseBranch () {
         3. Return the first unique name, or throw.
 
     .EXAMPLE
-        PS> Get-LastReleaseBranch -path '.\tests\DbUp'
+        PS> Get-LastReleaseBranch -path '.\tests\Github\DbUp'
         Returns release/6.0.0 when that is the newest release branch.
 
         PS> $name = Get-LastReleaseBranch -path $libraryPath
@@ -632,7 +632,7 @@ try {
     Assert-TestTrue -condition ($dateExport.CommitCount -eq $byDateAuthor.CommitCount) -label 'date export CommitCount matches the date lookup'
 
     Write-Section -message 'Branch diff cmdlets'
-    [string]$libraryPath = Join-Path -Path ([System.IO.Path]::GetFullPath($repoPath)) -ChildPath 'DbUp'
+    [string]$libraryPath = Join-Path -Path ([System.IO.Path]::GetFullPath($repoPath)) -ChildPath 'Github\DbUp'
     [string]$releaseBranch = Get-LastReleaseBranch -path $libraryPath
     [string]$diffBaseBranch = $releaseBranch
     [string]$diffTargetBranch = 'main'
