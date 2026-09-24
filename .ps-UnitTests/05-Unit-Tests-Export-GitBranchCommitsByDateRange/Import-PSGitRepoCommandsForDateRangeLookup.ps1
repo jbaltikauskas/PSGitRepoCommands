@@ -3,8 +3,23 @@ function Import-PSGitRepoCommandsForDateRangeLookup () {
     .SYNOPSIS
         Imports PSGitRepoCommands and asserts the date-range commands.
 
+    .DESCRIPTION
+        Loads the module from ModulePath and throws unless the date-range
+        get and export commands are exported.
+
     .PARAMETER modulePath
         Full path to PSGitRepoCommands.psd1.
+
+    .NOTES
+        1. Import the module at ModulePath.
+        2. Assert the date-range commands are exported.
+
+    .EXAMPLE
+        PS> Import-PSGitRepoCommandsForDateRangeLookup -modulePath 'C:\repo\.ps\PSGitRepoCommands\PSGitRepoCommands.psd1'
+        Imports the module and asserts the date-range commands.
+
+        PS> Import-PSGitRepoCommandsForDateRangeLookup -modulePath $resolvedModulePath
+        Same check using the path resolved by the runner.
     #>
     [CmdletBinding()]
     Param (
@@ -14,9 +29,10 @@ function Import-PSGitRepoCommandsForDateRangeLookup () {
     )
 
     Begin {
-        Write-Host ''
-        Write-Host ("BEGIN: {0}" -f $MyInvocation.MyCommand.Name) -ForegroundColor Yellow
-        $PSBoundParameters | Out-String | Write-Host
+
+        Write-Host ""
+        Write-Host ("--------------------------------- BEGIN: {0} ---------------------------------------------" -f $MyInvocation.MyCommand.Name) -ForegroundColor Yellow
+        Write-Host ""
     }
 
     Process {
@@ -26,6 +42,9 @@ function Import-PSGitRepoCommandsForDateRangeLookup () {
     }
 
     End {
-        Write-Host ("END: {0}" -f $MyInvocation.MyCommand.Name) -ForegroundColor Yellow
+
+        Write-Host ""
+        Write-Host ("--------------------------------- END: {0} ---------------------------------------------" -f $MyInvocation.MyCommand.Name) -ForegroundColor Yellow
+        Write-Host ""
     }
 }
