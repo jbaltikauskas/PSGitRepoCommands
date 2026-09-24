@@ -68,6 +68,9 @@ $ErrorActionPreference = 'Stop'
 $PSNativeCommandUseErrorActionPreference = $true
 
 . (Join-Path -Path $PSScriptRoot -ChildPath '.ps-UnitTests\PSUnitTests.ps1')
+foreach ($sectionScript in @(Get-ChildItem -LiteralPath (Join-Path -Path $PSScriptRoot -ChildPath '.ps-UnitTests\02-Unit-Tests-Export-GitBranchCommitsByAuthorOrEmail') -Filter '*.ps1')) {
+    . $sectionScript.FullName
+}
 
 [string]$resolvedModulePath = [System.IO.Path]::GetFullPath($modulePath)
 [string]$resolvedRepoPath = $null
@@ -86,46 +89,12 @@ try {
             keepTempRepo       = $keepTempRepo
         }) -boundParameters $PSBoundParameters
 
-    Write-Section -message 'Import PSGitRepoCommands'
-    Import-TestModule -modulePath $resolvedModulePath
-    Assert-TestCommandExported -name 'Get-GitBranchCommitsByAuthorOrEmail', 'Export-GitBranchCommitsByAuthorOrEmail'
+    Import-PSGitRepoCommandsForAuthorOrEmailLookup -modulePath $resolvedModulePath
+    $resolvedRepoPath = New-DatedTestFolderUnderTests -parentPath $repoPath
+    $byAuthor = Assert-CommitsByAuthorRobertWagner -libraryPath $libraryPath
+    Assert-CommitsByEmailRobertAtWagnerIdAu -libraryPath $libraryPath -authorTip @($byAuthor.Commits)[0]
+    Export-CommitsByAuthorRobertWagner -libraryPath $libraryPath -exportFolder $resolvedRepoPath -authorTip @($byAuthor.Commits)[0] -authorCommitCount $byAuthor.CommitCount
 
-    Write-Section -message 'Create dated test folder under tests/'
-    $resolvedRepoPath = New-TestRunFolder -parentPath $repoPath
-    Write-Host ("resolvedRepoPath = {0}" -f $resolvedRepoPath) -ForegroundColor DarkGray
-
-    Write-Section -message 'Commits by author Robert Wagner'
-    $byAuthor = Get-GitBranchCommitsByAuthorOrEmail -path $libraryPath -branch main -author 'Robert Wagner' -fetch:$false
-    $authorTip = @($byAuthor.Commits)[0]
-    Assert-TestTrue -condition ($byAuthor.CommitCount -eq 20) -label 'Get-GitBranchCommitsByAuthorOrEmail -author returns the default limit of 20' -details $byAuthor.CommitCount
-    Assert-TestTrue -condition ($byAuthor.Limit -eq 20) -label 'author lookup Limit is 20'
-    $olderAuthorCommit = @($byAuthor.Commits)[1]
-    Assert-TestTrue -condition ([datetime]$authorTip.AuthorDate -ge [datetime]$olderAuthorCommit.AuthorDate) -label 'author commits are newest first'
-    Assert-TestTrue -condition ($authorTip.Author -eq 'Robert Wagner') -label 'author lookup Author is Robert Wagner'
-    Assert-TestTrue -condition ($authorTip.AuthorEmail -eq 'robert@wagner.id.au') -label 'author lookup AuthorEmail is robert@wagner.id.au'
-    Assert-TestTrue -condition ($authorTip.AuthorDate -eq '2026-02-18T13:55:32+10:00') -label 'author lookup AuthorDate is 2026-02-18T13:55:32+10:00'
-    Assert-TestTrue -condition ($authorTip.Committer -eq 'Robert Wagner') -label 'author lookup Committer is Robert Wagner'
-    Assert-TestTrue -condition ($byAuthor.IncludePatch -eq $true) -label 'author lookup includes patch text'
-
-    Write-Section -message 'Commits by email robert@wagner.id.au'
-    $byEmail = Get-GitBranchCommitsByAuthorOrEmail -path $libraryPath -branch main -email 'robert@wagner.id.au' -fetch:$false -includePatch:$false
-    $emailTip = @($byEmail.Commits)[0]
-    Assert-TestTrue -condition ($byEmail.CommitCount -eq 20) -label 'Get-GitBranchCommitsByAuthorOrEmail -email returns the default limit of 20' -details $byEmail.CommitCount
-    Assert-TestTrue -condition ($byEmail.IncludePatch -eq $false) -label 'email lookup omits patch text'
-    Assert-TestTrue -condition ($emailTip.Hash -eq $authorTip.Hash) -label 'email lookup newest commit matches the author lookup'
-    Assert-TestTrue -condition ($emailTip.Author -eq 'Robert Wagner' -and $emailTip.AuthorEmail -eq 'robert@wagner.id.au' -and $emailTip.AuthorDate -eq '2026-02-18T13:55:32+10:00' -and $emailTip.Committer -eq 'Robert Wagner') -label 'email lookup tip identity matches Robert Wagner'
-
-    Write-Section -message 'Export commits by author Robert Wagner'
-    [string]$authorJsonPath = Join-Path -Path $resolvedRepoPath -ChildPath ('{0}-author-commits.json' -f $authorTip.Short)
-    $authorExport = Export-GitBranchCommitsByAuthorOrEmail -path $libraryPath -branch main -author 'Robert Wagner' -fetch:$false -outputPath $authorJsonPath
-    Assert-TestTrue -condition (Test-Path -LiteralPath $authorExport.JsonPath) -label 'Export-GitBranchCommitsByAuthorOrEmail wrote JSON' -details $authorExport.JsonPath
-    Assert-TestTrue -condition ($authorExport.JsonPath.StartsWith($resolvedRepoPath, [System.StringComparison]::OrdinalIgnoreCase)) -label 'author export JSON is in the dated test folder' -details $authorExport.JsonPath
-    Assert-TestTrue -condition ($authorExport.CommitCount -eq $byAuthor.CommitCount) -label 'author export CommitCount matches the author lookup'
-    $exportJson = Get-Content -LiteralPath $authorExport.JsonPath -Raw | ConvertFrom-Json
-    $exportTip = @($exportJson.Commits)[0]
-    Assert-TestTrue -condition ($exportTip.Author -eq 'Robert Wagner' -and $exportTip.AuthorEmail -eq 'robert@wagner.id.au' -and $exportTip.AuthorDate -eq '2026-02-18T13:55:32+10:00' -and $exportTip.Committer -eq 'Robert Wagner') -label 'author export JSON stores the real DbUp tip identity'
-
-    Write-Section -message 'Cleanup'
     Complete-TestRunFolder -repoPath $resolvedRepoPath -keep $keepTempRepo
     if (-not $keepTempRepo) {
         $resolvedRepoPath = $null

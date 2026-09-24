@@ -68,6 +68,9 @@ $ErrorActionPreference = 'Stop'
 $PSNativeCommandUseErrorActionPreference = $true
 
 . (Join-Path -Path $PSScriptRoot -ChildPath '.ps-UnitTests\PSUnitTests.ps1')
+foreach ($sectionScript in @(Get-ChildItem -LiteralPath (Join-Path -Path $PSScriptRoot -ChildPath '.ps-UnitTests\04-Unit-Tests-Export-GitBranchFullDiff') -Filter '*.ps1')) {
+    . $sectionScript.FullName
+}
 
 [string]$resolvedModulePath = [System.IO.Path]::GetFullPath($modulePath)
 [string]$resolvedRepoPath = $null
@@ -86,30 +89,10 @@ try {
             keepTempRepo       = $keepTempRepo
         }) -boundParameters $PSBoundParameters
 
-    Write-Section -message 'Import PSGitRepoCommands'
-    Import-TestModule -modulePath $resolvedModulePath
-    Assert-TestCommandExported -name 'Export-GitBranchFullDiff'
+    Import-PSGitRepoCommandsForFullDiff -modulePath $resolvedModulePath
+    $resolvedRepoPath = New-DatedTestFolderUnderTests -parentPath $repoPath
+    Export-LastReleaseBranchVersusMainFullDiff -libraryPath $libraryPath -exportFolder $resolvedRepoPath
 
-    Write-Section -message 'Create dated test folder under tests/'
-    $resolvedRepoPath = New-TestRunFolder -parentPath $repoPath
-    Write-Host ("resolvedRepoPath = {0}" -f $resolvedRepoPath) -ForegroundColor DarkGray
-
-    Write-Section -message 'Export last release versus main'
-    [string]$releaseBranch = Get-LastReleaseBranch -path $libraryPath
-    [string]$tipShort = (git -C $libraryPath rev-parse --short main).Trim()
-    Write-Host ("lastReleaseBranch = {0}" -f $releaseBranch) -ForegroundColor DarkGray
-    [string]$jsonPath = Join-Path -Path $resolvedRepoPath -ChildPath ('{0}-diff-export.json' -f $tipShort)
-    $export = Export-GitBranchFullDiff -path $libraryPath -baseBranch $releaseBranch -targetBranch main -direction TargetAhead -outputPath $jsonPath
-    Assert-TestTrue -condition (Test-Path -LiteralPath $export.JsonPath) -label 'Export-GitBranchFullDiff wrote JSON' -details $export.JsonPath
-    Assert-TestTrue -condition ($export.JsonPath.StartsWith($resolvedRepoPath, [System.StringComparison]::OrdinalIgnoreCase)) -label 'diff export JSON is in the dated test folder' -details $export.JsonPath
-    Assert-TestTrue -condition ($export.BaseBranch -eq $releaseBranch) -label 'diff export base is the last release branch' -details $releaseBranch
-    Assert-TestTrue -condition ($export.TargetBranch -eq 'main') -label 'diff export target is main'
-    Assert-TestTrue -condition ($export.TipDiff.FileCount -ge 1) -label 'diff export tip has at least one changed file' -details $export.TipDiff.FileCount
-    Assert-TestTrue -condition ($export.CommitDiff.CommitCount -ge 1) -label 'diff export has commits since the last release' -details $export.CommitDiff.CommitCount
-    $exportJson = Get-Content -LiteralPath $export.JsonPath -Raw | ConvertFrom-Json
-    Assert-TestTrue -condition ($exportJson.BaseBranch -eq $releaseBranch -and $exportJson.TargetBranch -eq 'main' -and $exportJson.TipDiff.FileCount -ge 1) -label 'diff export JSON stores the release-versus-main result'
-
-    Write-Section -message 'Cleanup'
     Complete-TestRunFolder -repoPath $resolvedRepoPath -keep $keepTempRepo
     if (-not $keepTempRepo) {
         $resolvedRepoPath = $null

@@ -69,6 +69,9 @@ $ErrorActionPreference = 'Stop'
 $PSNativeCommandUseErrorActionPreference = $true
 
 . (Join-Path -Path $PSScriptRoot -ChildPath '.ps-UnitTests\PSUnitTests.ps1')
+foreach ($sectionScript in @(Get-ChildItem -LiteralPath (Join-Path -Path $PSScriptRoot -ChildPath '.ps-UnitTests\03-Unit-Tests-Export-GitBranchCommitByID') -Filter '*.ps1')) {
+    . $sectionScript.FullName
+}
 
 [string]$resolvedModulePath = [System.IO.Path]::GetFullPath($modulePath)
 [string]$resolvedRepoPath = $null
@@ -87,70 +90,12 @@ try {
             keepTempRepo       = $keepTempRepo
         }) -boundParameters $PSBoundParameters
 
-    Write-Section -message 'Import PSGitRepoCommands'
-    Import-TestModule -modulePath $resolvedModulePath
-    Assert-TestCommandExported -name 'Get-GitBranchCommitByID', 'Export-GitBranchCommitByID'
+    Import-PSGitRepoCommandsForCommitByID -modulePath $resolvedModulePath
+    $resolvedRepoPath = New-DatedTestFolderUnderTests -parentPath $repoPath
+    [string]$branchTip = Assert-LatestCommitsOnDbUpMain -libraryPath $libraryPath
+    $byNumber = Assert-DbUpMainTipByNumberShortHashAndFullHash -libraryPath $libraryPath -branchTip $branchTip
+    Export-DbUpMainTipCommitByID -libraryPath $libraryPath -exportFolder $resolvedRepoPath -branchTip $branchTip -byNumber $byNumber
 
-    Write-Section -message 'Create dated test folder under tests/'
-    $resolvedRepoPath = New-TestRunFolder -parentPath $repoPath
-    Write-Host ("resolvedRepoPath = {0}" -f $resolvedRepoPath) -ForegroundColor DarkGray
-
-    Write-Section -message 'Latest commits on main'
-    [string]$branchTip = (git -C $libraryPath rev-parse main).Trim()
-    $latest = Get-GitBranchCommitByID -path $libraryPath -branch main -fetch:$false -includePatch:$false
-    $latestTip = @($latest.Commits)[0]
-    $olderLatest = @($latest.Commits)[1]
-    Assert-TestTrue -condition ($latest.CommitCount -eq 20) -label 'Get-GitBranchCommitByID returns the default limit of 20' -details $latest.CommitCount
-    Assert-TestTrue -condition ($latest.Limit -eq 20) -label 'commit lookup Limit is 20'
-    Assert-TestTrue -condition ([datetime]$latestTip.AuthorDate -ge [datetime]$olderLatest.AuthorDate) -label 'branch commits are newest first'
-    Assert-TestTrue -condition ($latestTip.Number -eq 1 -and $latestTip.Hash -eq $branchTip) -label 'commit number 1 in the list is the branch tip'
-    Assert-TestTrue -condition ($latestTip.Author -eq 'Robert Wagner' -and $latestTip.AuthorEmail -eq 'robert@wagner.id.au' -and $latestTip.AuthorDate -eq '2026-02-18T13:55:32+10:00' -and $latestTip.Committer -eq 'Robert Wagner') -label 'latest tip identity matches Robert Wagner'
-
-    $limited = Get-GitBranchCommitByID -path $libraryPath -branch main -limit 3 -fetch:$false -includePatch:$false
-    Assert-TestTrue -condition ($limited.CommitCount -eq 3 -and $limited.Limit -eq 3) -label 'Get-GitBranchCommitByID -limit 3 returns three commits'
-    Assert-TestTrue -condition (@($limited.Commits)[0].Hash -eq $branchTip) -label '-limit 3 still starts at the branch tip'
-
-    [bool]$numberPastLimit = $false
-    try {
-        Get-GitBranchCommitByID -path $libraryPath -branch main -number 21 -fetch:$false -includePatch:$false | Out-Null
-    }
-    catch {
-        $numberPastLimit = $true
-    }
-    Assert-TestTrue -condition $numberPastLimit -label 'commit number 21 is outside the default limit of 20'
-
-    Write-Section -message 'Select the main tip by number, short hash, and full hash'
-    $byNumber = Get-GitBranchCommitByID -path $libraryPath -branch main -number 1 -fetch:$false -includePatch:$false
-    Assert-TestTrue -condition ($byNumber.Hash -eq $branchTip) -label 'Get-GitBranchCommitByID -number 1 is the branch tip'
-    Assert-TestTrue -condition ($byNumber.Author -eq 'Robert Wagner') -label 'tip Author is Robert Wagner'
-    Assert-TestTrue -condition ($byNumber.AuthorEmail -eq 'robert@wagner.id.au') -label 'tip AuthorEmail is robert@wagner.id.au'
-    Assert-TestTrue -condition ($byNumber.AuthorDate -eq '2026-02-18T13:55:32+10:00') -label 'tip AuthorDate is 2026-02-18T13:55:32+10:00'
-    Assert-TestTrue -condition ($byNumber.Committer -eq 'Robert Wagner') -label 'tip Committer is Robert Wagner'
-
-    $byShort = Get-GitBranchCommitByID -path $libraryPath -branch main -shortHash $byNumber.Short -fetch:$false -includePatch:$false
-    Assert-TestTrue -condition ($byShort.Hash -eq $branchTip) -label 'Get-GitBranchCommitByID -shortHash matches the tip'
-
-    $byFull = Get-GitBranchCommitByID -path $libraryPath -branch main -hash $byNumber.Hash -fetch:$false -includePatch:$false
-    Assert-TestTrue -condition ($byFull.Hash -eq $branchTip) -label 'Get-GitBranchCommitByID -hash matches the tip'
-
-    Write-Section -message 'Export the main tip'
-    [string]$shortJsonPath = Join-Path -Path $resolvedRepoPath -ChildPath ('{0}-commit-export.json' -f $byNumber.Short)
-    $shortExport = Export-GitBranchCommitByID -path $libraryPath -branch main -shortHash $byNumber.Short -fetch:$false -includePatch:$false -outputPath $shortJsonPath
-    Assert-TestTrue -condition ($shortExport.JsonPath.StartsWith($resolvedRepoPath, [System.StringComparison]::OrdinalIgnoreCase)) -label 'short-hash export JSON is in the dated test folder' -details $shortExport.JsonPath
-    Assert-TestTrue -condition ($shortExport.Commit.Hash -eq $branchTip) -label 'short-hash export commit is the branch tip'
-
-    [string]$numberJsonPath = Join-Path -Path $resolvedRepoPath -ChildPath ('{0}-commit-by-number.json' -f $byNumber.Short)
-    $numberExport = Export-GitBranchCommitByID -path $libraryPath -branch main -number 1 -fetch:$false -includePatch:$false -outputPath $numberJsonPath
-    Assert-TestTrue -condition ($numberExport.Commit.Hash -eq $branchTip) -label 'number export commit is the branch tip'
-
-    [string]$hashJsonPath = Join-Path -Path $resolvedRepoPath -ChildPath ('{0}-commit-by-hash.json' -f $byNumber.Short)
-    $hashExport = Export-GitBranchCommitByID -path $libraryPath -branch main -hash $byNumber.Hash -fetch:$false -includePatch:$false -outputPath $hashJsonPath
-    Assert-TestTrue -condition ($hashExport.Commit.Hash -eq $branchTip) -label 'full-hash export commit is the branch tip'
-
-    $exportJson = Get-Content -LiteralPath $shortExport.JsonPath -Raw | ConvertFrom-Json
-    Assert-TestTrue -condition ($exportJson.Commit.Author -eq 'Robert Wagner' -and $exportJson.Commit.AuthorEmail -eq 'robert@wagner.id.au' -and $exportJson.Commit.AuthorDate -eq '2026-02-18T13:55:32+10:00' -and $exportJson.Commit.Committer -eq 'Robert Wagner') -label 'commit export JSON stores the real DbUp tip identity'
-
-    Write-Section -message 'Cleanup'
     Complete-TestRunFolder -repoPath $resolvedRepoPath -keep $keepTempRepo
     if (-not $keepTempRepo) {
         $resolvedRepoPath = $null
