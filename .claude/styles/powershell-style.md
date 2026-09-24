@@ -12,7 +12,7 @@ Every new `.ps1` file in this workspace follows the same five-block layout. Keep
 1. Comment-based help block (`<# ... #>`) with `.SYNOPSIS`, `.DESCRIPTION`, one `.PARAMETER` per parameter, `.INPUTS`, `.OUTPUTS`, `.NOTES`, two or more `.EXAMPLE` blocks.
 2. `#Requires -Version 7.2` (or whatever minimum the script needs).
 3. `[CmdletBinding()] Param ( ... )` block with one `[Parameter(...)]` attribute per parameter.
-4. Function definitions, each as an advanced function with its own `[CmdletBinding()] Param ( ... )`. After **`Param`**, use **`Begin` + `Process`** (helpers/scripts) or **`Begin` + `Process` + `End`** (public PSGitRepoCommands cmdlets with yellow Begin/END banners). A plain **`{ ... }`** body or **`Process`** only is also allowed for helpers.
+4. Function definitions, each as an advanced function with its own `[CmdletBinding()] Param ( ... )`. After **`Param`**, use **`Begin` + `Process`** (helpers/scripts) or **`Begin` + `Process` + `End`** (public PSGitRepoCommands cmdlets with yellow Begin/END banners). A plain **`{ ... }`** body or **`Process`** only is also allowed for helpers. Files under **`.ps-UnitTests`** follow **`.ps-UnitTests` exceptions** instead of the helper Begin/END rules.
 5. `try { ... } catch { ... }` wrapper that runs the orchestration. The catch prints the exception, prompts the user to close the window, and exits with code 1. After the wrapper, print a success line and prompt to close.
 
 ## Block 1: Comment-based help
@@ -189,9 +189,9 @@ Helpers that touch secrets stay minimal per workspace secret rules: `.DESCRIPTIO
     }
     ```
 
-- **`$PSBoundParameters | Out-String | Write-Host`** in **`Begin`** is **optional**. Add it only when bound-parameter tracing is useful for that function (debugging, CI reproducibility). Omit it when it is just noise. Never dump **`[SecureString]`** / secret parameters.
+- **`$PSBoundParameters | Out-String | Write-Host`** in **`Begin`** is **optional**. Add it only when bound-parameter tracing is useful for that function (debugging, CI reproducibility). Omit it when it is just noise. Never dump **`[SecureString]`** / secret parameters. Files under **`.ps-UnitTests`** never dump **`$PSBoundParameters`**.
 
-- Helpers and scripts **do not** use **`End { }`** or per-function yellow Begin/END banners. They may dump **`$PSBoundParameters`** in **`Begin`** when needed, plus script-level **`BEGIN: Settings`**.
+- Helpers and scripts **do not** use **`End { }`** or per-function yellow Begin/END banners. They may dump **`$PSBoundParameters`** in **`Begin`** when needed, plus script-level **`BEGIN: Settings`**. Functions in **`.ps-UnitTests`** are the other exception: see **`.ps-UnitTests` exceptions**.
 
 - An advanced function that **declares one or more parameters** uses **`Begin`** then **`Process`**. The bound-parameter dump is not required. Omit **`Begin`** entirely when **`Param`** is empty, or when any parameter is **`[SecureString]`** / secret material.
 
@@ -217,6 +217,41 @@ Function rules:
   - `New-Foo`: creates something on disk or in memory and returns it.
   - `Write-Foo`: writes to disk or to the host. Returns void or the path.
   - `Read-FooInteractive`: prompts the user and validates the input in a loop.
+
+## `.ps-UnitTests` exceptions
+
+These four exceptions apply **only** to `.ps1` files under **`.ps-UnitTests`**. Everywhere else, the rules above stay in force.
+
+1. **Do not dump bound parameters.** Omit **`$PSBoundParameters | Out-String | Write-Host`** from **`Begin`**. Do not add it for tracing.
+
+2. **BEGIN banner.** Every function uses **`Begin`** and prints one yellow dashed banner. Take the name from **`$MyInvocation.MyCommand.Name`**. Do not hardcode the function name.
+
+    ```powershell
+    Begin {
+
+        Write-Host ""
+        Write-Host ("--------------------------------- BEGIN: {0} ---------------------------------------------" -f $MyInvocation.MyCommand.Name) -ForegroundColor Yellow
+        Write-Host ""
+    }
+    ```
+
+3. **END banner.** Every function also uses **`End`** with the same dashes. This **`End`** block is required here even though helpers elsewhere must not use **`End`**.
+
+    ```powershell
+    End {
+
+        Write-Host ""
+        Write-Host ("--------------------------------- END: {0} ---------------------------------------------" -f $MyInvocation.MyCommand.Name) -ForegroundColor Yellow
+        Write-Host ""
+    }
+    ```
+
+4. **`Write-Host` before every `Assert-TestTrue`.** On the line immediately above each **`Assert-TestTrue`**, **`Write-Host`** the same text as **`-label`**, in Cyan, so the log shows the check before PASS or the throw. No blank line between that **`Write-Host`** and the assertion.
+
+    ```powershell
+    Write-Host 'Get-GitBranchCommitByID -shortHash matches the same commit' -ForegroundColor Cyan
+    Assert-TestTrue -condition ($byShort.Hash -eq $byNumber.Hash) -label 'Get-GitBranchCommitByID -shortHash matches the same commit'
+    ```
 
 ## Block 5: Try/catch wrapper
 
@@ -440,9 +475,9 @@ Match the reference exactly so logs look the same across scripts:
 ## What NOT to do
 
 - Do not skip the help block "because the script is small". Future readers count on it.
-- Do **not** add **`End { }`** to helpers or scripts. Public PSGitRepoCommands cmdlets **do** use **`End { }`** with yellow **`END: FunctionName`** banners.
+- Do **not** add **`End { }`** to helpers or scripts. Public PSGitRepoCommands cmdlets **do** use **`End { }`** with yellow **`END: FunctionName`** banners. Functions under **`.ps-UnitTests`** also use **`End { }`** (see **`.ps-UnitTests` exceptions**).
 
-- Do **not** use per-function **`Write-Host`** "**Begin: Func**" / "**END: Func**" banners on helpers or scripts (**`BEGIN: Settings`** / **`END: Settings`** at script level stay fine). Public PSGitRepoCommands cmdlets are the exception.
+- Do **not** use per-function **`Write-Host`** "**Begin: Func**" / "**END: Func**" banners on helpers or scripts (**`BEGIN: Settings`** / **`END: Settings`** at script level stay fine). Public PSGitRepoCommands cmdlets and **`.ps-UnitTests`** functions are the exceptions.
 - Do not mix Pascal case and camel case inside one script. Pick one (this workspace uses camel case for parameters, Pascal for functions) and stick to it.
 - Do not call `exit` or `return` from inside a function as the failure path. `throw` and let the top-level catch format the error.
 - Do not use `Write-Error` for control flow. It is for diagnostics inside the catch.
@@ -459,7 +494,7 @@ Match the reference exactly so logs look the same across scripts:
 1. Help block has `.SYNOPSIS`, `.DESCRIPTION` (with numbered flow), one `.PARAMETER` per parameter, `.INPUTS`, `.OUTPUTS`, `.NOTES`, two or more `.EXAMPLE`.
 2. `#Requires -Version`, `$ErrorActionPreference = 'Stop'`, `$PSNativeCommandUseErrorActionPreference = $true` are set.
 3. Every parameter has `[Parameter(...)]` with `HelpMessage` and an appropriate `Validate*` attribute.
-4. Every function is an advanced function. Public PSGitRepoCommands cmdlets use **`Begin` + `Process` + `End`** with yellow **`Begin: Name` / `END: Name`** banners. **`$PSBoundParameters | Out-String | Write-Host`** in **`Begin`** is optional (use only when tracing is needed). Helpers/scripts use **`Begin` + `Process`** with no **`End`**; secret-only helpers **`Process`** only. After **`Process {`**, one empty line before the first inner statement.
+4. Every function is an advanced function. Public PSGitRepoCommands cmdlets use **`Begin` + `Process` + `End`** with yellow **`Begin: Name` / `END: Name`** banners. **`$PSBoundParameters | Out-String | Write-Host`** in **`Begin`** is optional (use only when tracing is needed). Helpers/scripts use **`Begin` + `Process`** with no **`End`**; secret-only helpers **`Process`** only. Files under **`.ps-UnitTests`** use the dashed **`BEGIN`/`END`** banners from **`$MyInvocation.MyCommand.Name`**, omit the bound-parameter dump, and **`Write-Host`** the label immediately before each **`Assert-TestTrue`**. After **`Process {`**, one empty line before the first inner statement.
 5. Every function has comment-based help with **`.SYNOPSIS`**, **`.DESCRIPTION`**, **`.NOTES`**, and **one `.EXAMPLE` section last** containing multiple samples (see **Function comment-based help**). Use exactly one blank line between help sections. Do not use `.REMARKS`. In `.NOTES`, skip printing-only steps unless that is the function's contract.
 6. The orchestration lives in one `try { ... }` block. After every **`try {`**, one empty line before the first inner statement (including nested **`try`**).
 7. The catch prints exception type and message, then `Read-Host`, then `EXIT 1`.
