@@ -20,10 +20,6 @@ function Assert-TestCommandExported () {
         [string[]]$name
     )
 
-    Begin {
-        $PSBoundParameters | Out-String | Write-Host
-    }
-
     Process {
 
         foreach ($commandName in $name) {

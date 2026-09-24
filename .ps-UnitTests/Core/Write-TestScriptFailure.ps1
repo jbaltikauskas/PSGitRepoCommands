@@ -39,10 +39,6 @@ function Write-TestScriptFailure () {
         [bool]$pause = $true
     )
 
-    Begin {
-        $PSBoundParameters | Out-String | Write-Host
-    }
-
     Process {
 
         Write-Host ''

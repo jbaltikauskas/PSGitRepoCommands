@@ -26,10 +26,6 @@ function Write-Section () {
         [string]$message
     )
 
-    Begin {
-        $PSBoundParameters | Out-String | Write-Host
-    }
-
     Process {
 
         Write-Host ''

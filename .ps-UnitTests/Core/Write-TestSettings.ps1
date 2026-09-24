@@ -25,10 +25,6 @@ function Write-TestSettings () {
         [System.Collections.IDictionary]$boundParameters
     )
 
-    Begin {
-        $PSBoundParameters | Out-String | Write-Host
-    }
-
     Process {
 
         Write-Host 'BEGIN: Settings' -ForegroundColor Yellow

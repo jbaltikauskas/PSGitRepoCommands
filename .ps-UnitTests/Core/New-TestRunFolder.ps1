@@ -31,10 +31,6 @@ function New-TestRunFolder () {
         [string]$parentPath
     )
 
-    Begin {
-        $PSBoundParameters | Out-String | Write-Host
-    }
-
     Process {
 
         [string]$resolvedParent = [System.IO.Path]::GetFullPath($parentPath)

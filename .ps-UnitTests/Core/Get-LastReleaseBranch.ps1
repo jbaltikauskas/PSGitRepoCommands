@@ -30,10 +30,6 @@ function Get-LastReleaseBranch () {
         [string]$path
     )
 
-    Begin {
-        $PSBoundParameters | Out-String | Write-Host
-    }
-
     Process {
 
         [string]$resolvedPath = [System.IO.Path]::GetFullPath($path)

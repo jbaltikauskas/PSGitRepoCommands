@@ -27,10 +27,6 @@ function Complete-TestRunFolder () {
         [bool]$keep
     )
 
-    Begin {
-        $PSBoundParameters | Out-String | Write-Host
-    }
-
     Process {
 
         if ($keep) {

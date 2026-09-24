@@ -21,10 +21,6 @@ function Get-TestLibraryPath () {
         [string]$repoPath
     )
 
-    Begin {
-        $PSBoundParameters | Out-String | Write-Host
-    }
-
     Process {
 
         [string]$libraryPath = Join-Path -Path ([System.IO.Path]::GetFullPath($repoPath)) -ChildPath 'Github\DbUp'

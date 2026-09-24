@@ -20,10 +20,6 @@ function Import-TestModule () {
         [string]$modulePath
     )
 
-    Begin {
-        $PSBoundParameters | Out-String | Write-Host
-    }
-
     Process {
 
         if (-not (Test-Path -LiteralPath $modulePath)) {

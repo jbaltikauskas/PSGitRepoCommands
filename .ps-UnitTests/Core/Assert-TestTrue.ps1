@@ -41,10 +41,6 @@ function Assert-TestTrue () {
         [string]$details
     )
 
-    Begin {
-        $PSBoundParameters | Out-String | Write-Host
-    }
-
     Process {
 
         if (-not $condition) {

@@ -29,10 +29,6 @@ function Clear-TestGitRepository () {
         [string]$repoPath
     )
 
-    Begin {
-        $PSBoundParameters | Out-String | Write-Host
-    }
-
     Process {
 
         [string]$resolvedRepoPath = [System.IO.Path]::GetFullPath($repoPath)
