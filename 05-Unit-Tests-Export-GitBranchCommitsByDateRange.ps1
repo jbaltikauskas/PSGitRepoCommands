@@ -67,8 +67,8 @@ Param (
 $ErrorActionPreference = 'Stop'
 $PSNativeCommandUseErrorActionPreference = $true
 
-. (Join-Path -Path $PSScriptRoot -ChildPath '.ps-UnitTests' -AdditionalChildPath 'PSUnitTests.ps1')
-foreach ($sectionScript in @(Get-ChildItem -LiteralPath (Join-Path -Path $PSScriptRoot -ChildPath '.ps-UnitTests' -AdditionalChildPath '05-Unit-Tests-Export-GitBranchCommitsByDateRange') -Filter '*.ps1')) {
+. (Join-Path -Path $PSScriptRoot -ChildPath '.ps' -AdditionalChildPath 'UnitTests', 'PSUnitTests.ps1')
+foreach ($sectionScript in @(Get-ChildItem -LiteralPath (Join-Path -Path $PSScriptRoot -ChildPath '.ps' -AdditionalChildPath 'UnitTests', '05-Unit-Tests-Export-GitBranchCommitsByDateRange') -Filter '*.ps1')) {
     . $sectionScript.FullName
 }
 
