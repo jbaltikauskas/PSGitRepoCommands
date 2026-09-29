@@ -51,7 +51,7 @@
 Param (
     [Parameter(Mandatory = $false, HelpMessage = "Path to PSGitRepoCommands.psd1.")]
     [ValidateNotNullOrEmpty()]
-    [string]$modulePath = (Join-Path -Path $PSScriptRoot -ChildPath '.ps\PSGitRepoCommands\PSGitRepoCommands.psd1'),
+    [string]$modulePath = (Join-Path -Path $PSScriptRoot -ChildPath '.ps' -AdditionalChildPath 'PSGitRepoCommands', 'PSGitRepoCommands.psd1'),
 
     [Parameter(Mandatory = $false, HelpMessage = "Parent folder for the JSON export. Defaults to tests/ under the script root.")]
     [ValidateNotNullOrEmpty()]
@@ -67,8 +67,8 @@ Param (
 $ErrorActionPreference = 'Stop'
 $PSNativeCommandUseErrorActionPreference = $true
 
-. (Join-Path -Path $PSScriptRoot -ChildPath '.ps-UnitTests\PSUnitTests.ps1')
-foreach ($sectionScript in @(Get-ChildItem -LiteralPath (Join-Path -Path $PSScriptRoot -ChildPath '.ps-UnitTests\04-Unit-Tests-Export-GitBranchFullDiff') -Filter '*.ps1')) {
+. (Join-Path -Path $PSScriptRoot -ChildPath '.ps-UnitTests' -AdditionalChildPath 'PSUnitTests.ps1')
+foreach ($sectionScript in @(Get-ChildItem -LiteralPath (Join-Path -Path $PSScriptRoot -ChildPath '.ps-UnitTests' -AdditionalChildPath '04-Unit-Tests-Export-GitBranchFullDiff') -Filter '*.ps1')) {
     . $sectionScript.FullName
 }
 

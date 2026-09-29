@@ -273,7 +273,7 @@ else {
                     continue
                 }
                 $path = $tokens[-1]
-                $dest = Join-Path $filesRoot ($path -replace '/', '\')
+                $dest = Join-Path -Path $filesRoot -ChildPath $path
                 New-Folder -Path (Split-Path -Parent $dest)
                 $content = (git @g show ("{0}:{1}" -f $hash, $path)) -join "`n"
                 Write-TextFile -Path $dest -Content $content

@@ -5,6 +5,7 @@
     Author            = 'PSGitRepoCommands'
     Description       = 'PowerShell helpers for Git branch operations and structured branch-to-branch diffs (PSCustomObject / JSON).'
     PowerShellVersion = '7.2'
+    CompatiblePSEditions = @('Core')
     FunctionsToExport = @(
         'Get-GitBranch'
         'Get-GitCurrentBranch'
