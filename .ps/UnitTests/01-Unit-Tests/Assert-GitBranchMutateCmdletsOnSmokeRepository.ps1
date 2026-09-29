@@ -18,7 +18,7 @@ function Assert-GitBranchMutateCmdletsOnSmokeRepository () {
         4. Switch back to main and remove feature/z.
 
     .EXAMPLE
-        PS> Assert-GitBranchMutateCmdletsOnSmokeRepository -repoPath 'C:\repo\tests\20260923-2300'
+        PS> Assert-GitBranchMutateCmdletsOnSmokeRepository -repoPath 'C:/repo/tests/20260923-2300'
         Creates, switches, renames, compares, and removes branches on that root.
 
         PS> Assert-GitBranchMutateCmdletsOnSmokeRepository -repoPath $resolvedRepoPath
@@ -43,6 +43,7 @@ function Assert-GitBranchMutateCmdletsOnSmokeRepository () {
         $created = New-GitBranch -path $repoPath -name 'feature/y' -startPoint 'main'
         Write-Host 'New-GitBranch feature/y' -ForegroundColor Cyan
         Assert-TestTrue -condition ($created.Name -eq 'feature/y') -label 'New-GitBranch feature/y'
+
         Write-Host 'New-GitBranch did not switch' -ForegroundColor Cyan
         Assert-TestTrue -condition ($created.Switched -eq $false) -label 'New-GitBranch did not switch'
 
@@ -57,6 +58,7 @@ function Assert-GitBranchMutateCmdletsOnSmokeRepository () {
         $compare = Compare-GitBranch -path $repoPath -baseBranch 'main' -compareBranch 'feature/x'
         Write-Host 'Compare-GitBranch returns Ahead' -ForegroundColor Cyan
         Assert-TestTrue -condition ($null -ne $compare.Ahead) -label 'Compare-GitBranch returns Ahead'
+
         Write-Host 'Compare-GitBranch returns Behind' -ForegroundColor Cyan
         Assert-TestTrue -condition ($null -ne $compare.Behind) -label 'Compare-GitBranch returns Behind'
 

@@ -19,7 +19,7 @@ function Assert-CommitsByEmailRobertAtWagnerIdAu () {
         3. Assert the newest commit matches AuthorTip.
 
     .EXAMPLE
-        PS> Assert-CommitsByEmailRobertAtWagnerIdAu -libraryPath 'C:\repo\tests\Github\DbUp' -authorTip $tip
+        PS> Assert-CommitsByEmailRobertAtWagnerIdAu -libraryPath 'C:/repo/tests/Github/DbUp' -authorTip $tip
         Asserts the email lookup matches the author tip.
 
         PS> Assert-CommitsByEmailRobertAtWagnerIdAu -libraryPath $libraryPath -authorTip $authorTip
@@ -49,10 +49,13 @@ function Assert-CommitsByEmailRobertAtWagnerIdAu () {
         $emailTip = @($byEmail.Commits)[0]
         Write-Host 'Get-GitBranchCommitsByAuthorOrEmail -email returns the default limit of 20' -ForegroundColor Cyan
         Assert-TestTrue -condition ($byEmail.CommitCount -eq 20) -label 'Get-GitBranchCommitsByAuthorOrEmail -email returns the default limit of 20' -details $byEmail.CommitCount
+
         Write-Host 'email lookup omits patch text' -ForegroundColor Cyan
         Assert-TestTrue -condition ($byEmail.IncludePatch -eq $false) -label 'email lookup omits patch text'
+
         Write-Host 'email lookup newest commit matches the author lookup' -ForegroundColor Cyan
         Assert-TestTrue -condition ($emailTip.Hash -eq $authorTip.Hash) -label 'email lookup newest commit matches the author lookup'
+
         Write-Host 'email lookup tip identity matches Robert Wagner' -ForegroundColor Cyan
         Assert-TestTrue -condition ($emailTip.Author -eq 'Robert Wagner' -and $emailTip.AuthorEmail -eq 'robert@wagner.id.au' -and $emailTip.AuthorDate -eq '2026-02-18T13:55:32+10:00' -and $emailTip.Committer -eq 'Robert Wagner') -label 'email lookup tip identity matches Robert Wagner'
     }

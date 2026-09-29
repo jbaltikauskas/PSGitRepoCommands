@@ -15,7 +15,7 @@ function Import-PSGitRepoCommandsForCommitByID () {
         2. Assert the commit-by-id commands are exported.
 
     .EXAMPLE
-        PS> Import-PSGitRepoCommandsForCommitByID -modulePath 'C:\repo\.ps\PSGitRepoCommands\PSGitRepoCommands.psd1'
+        PS> Import-PSGitRepoCommandsForCommitByID -modulePath 'C:/repo/.ps/PSGitRepoCommands/PSGitRepoCommands.psd1'
         Imports the module and asserts the commit-by-id commands.
 
         PS> Import-PSGitRepoCommandsForCommitByID -modulePath $resolvedModulePath

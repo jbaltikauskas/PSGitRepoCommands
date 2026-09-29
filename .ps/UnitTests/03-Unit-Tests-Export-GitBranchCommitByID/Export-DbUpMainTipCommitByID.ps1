@@ -26,7 +26,7 @@ function Export-DbUpMainTipCommitByID () {
         3. Assert the short-hash JSON stores the real DbUp tip identity.
 
     .EXAMPLE
-        PS> Export-DbUpMainTipCommitByID -libraryPath 'C:\repo\tests\Github\DbUp' -exportFolder 'C:\repo\tests\20260923-2300' -branchTip $hash -byNumber $commit
+        PS> Export-DbUpMainTipCommitByID -libraryPath 'C:/repo/tests/Github/DbUp' -exportFolder 'C:/repo/tests/20260923-2300' -branchTip $hash -byNumber $commit
         Writes the three tip JSON files and asserts the tip identity.
 
         PS> Export-DbUpMainTipCommitByID -libraryPath $libraryPath -exportFolder $exportFolder -branchTip $branchTip -byNumber $byNumber
@@ -64,6 +64,7 @@ function Export-DbUpMainTipCommitByID () {
         $shortExport = Export-GitBranchCommitByID -path $libraryPath -branch main -shortHash $byNumber.Short -fetch:$false -includePatch:$false -outputPath $shortJsonPath
         Write-Host 'short-hash export JSON is in the dated test folder' -ForegroundColor Cyan
         Assert-TestTrue -condition ($shortExport.JsonPath.StartsWith($exportFolder, [System.StringComparison]::OrdinalIgnoreCase)) -label 'short-hash export JSON is in the dated test folder' -details $shortExport.JsonPath
+
         Write-Host 'short-hash export commit is the branch tip' -ForegroundColor Cyan
         Assert-TestTrue -condition ($shortExport.Commit.Hash -eq $branchTip) -label 'short-hash export commit is the branch tip'
 

@@ -20,7 +20,7 @@ function Assert-LibraryMainTipCommitByNumberShortHashAndFullHash () {
         3. Return the tip hash and the number-1 commit.
 
     .EXAMPLE
-        PS> Assert-LibraryMainTipCommitByNumberShortHashAndFullHash -libraryPath 'C:\repo\tests\Github\DbUp' -diffTargetBranch 'main'
+        PS> Assert-LibraryMainTipCommitByNumberShortHashAndFullHash -libraryPath 'C:/repo/tests/Github/DbUp' -diffTargetBranch 'main'
         Asserts number, short-hash, and full-hash selection of the main tip.
 
         PS> $selectedTip = Assert-LibraryMainTipCommitByNumberShortHashAndFullHash -libraryPath $fullDiff.LibraryPath -diffTargetBranch $fullDiff.DiffTargetBranch
@@ -50,6 +50,7 @@ function Assert-LibraryMainTipCommitByNumberShortHashAndFullHash () {
         $byNumber = Get-GitBranchCommitByID -path $libraryPath -branch $diffTargetBranch -number 1 -fetch:$false -includePatch:$false
         Write-Host 'Get-GitBranchCommitByID uses the requested branch' -ForegroundColor Cyan
         Assert-TestTrue -condition ($byNumber.Branch -eq $diffTargetBranch) -label 'Get-GitBranchCommitByID uses the requested branch'
+
         Write-Host 'Get-GitBranchCommitByID -number 1 is the branch tip' -ForegroundColor Cyan
         Assert-TestTrue -condition ($byNumber.Hash -eq $branchTip) -label 'Get-GitBranchCommitByID -number 1 is the branch tip'
 

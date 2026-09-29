@@ -18,7 +18,7 @@ function Write-TextFile () {
         2. Write UTF-8 without BOM via File.WriteAllText.
 
     .EXAMPLE
-        PS> Write-TextFile -path '.\out.txt' -content "hello`n"
+        PS> Write-TextFile -path './out.txt' -content "hello`n"
         Writes hello plus a newline to out.txt without a BOM.
 
         PS> Write-TextFile -path $jsonPath -content $jsonText

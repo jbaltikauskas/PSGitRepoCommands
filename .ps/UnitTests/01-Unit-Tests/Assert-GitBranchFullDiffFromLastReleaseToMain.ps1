@@ -10,7 +10,7 @@ function Assert-GitBranchFullDiffFromLastReleaseToMain () {
         diff so later sections can export the same range.
 
     .PARAMETER repoPath
-        Parent tests folder that contains Github\DbUp.
+        Parent tests folder that contains Github/DbUp.
 
     .NOTES
         1. Resolve the library path and the newest release branch.
@@ -19,7 +19,7 @@ function Assert-GitBranchFullDiffFromLastReleaseToMain () {
         4. Return the library path, branches, and tip diff.
 
     .EXAMPLE
-        PS> Assert-GitBranchFullDiffFromLastReleaseToMain -repoPath 'C:\repo\tests'
+        PS> Assert-GitBranchFullDiffFromLastReleaseToMain -repoPath 'C:/repo/tests'
         Asserts the DbUp release-to-main diff and returns the tip object.
 
         PS> $fullDiff = Assert-GitBranchFullDiffFromLastReleaseToMain -repoPath $repoPath
@@ -27,7 +27,7 @@ function Assert-GitBranchFullDiffFromLastReleaseToMain () {
     #>
     [CmdletBinding()]
     Param (
-        [Parameter(Mandatory = $true, HelpMessage = "Parent tests folder that contains Github\DbUp.")]
+        [Parameter(Mandatory = $true, HelpMessage = "Parent tests folder that contains Github/DbUp.")]
         [ValidateNotNullOrEmpty()]
         [string]$repoPath
     )
@@ -75,6 +75,7 @@ function Assert-GitBranchFullDiffFromLastReleaseToMain () {
 
         Write-Host ("Get-GitBranchFullDiff base is last release branch {0}" -f $releaseBranch) -ForegroundColor Cyan
         Assert-TestTrue -condition ($tip.BaseBranch -eq $releaseBranch) -label ("Get-GitBranchFullDiff base is last release branch {0}" -f $releaseBranch) -details ("Range={0}" -f $tip.Range)
+
         Write-Host ("Get-GitBranchFullDiff returns at least one changed file for {0}..{1}" -f $releaseBranch, $diffTargetBranch) -ForegroundColor Cyan
         Assert-TestTrue -condition ($tip.FileCount -ge 1) -label ("Get-GitBranchFullDiff returns at least one changed file for {0}..{1}" -f $releaseBranch, $diffTargetBranch) -details ("FileCount={0}; Paths=[{1}]" -f $tip.FileCount, $tipPathList)
 

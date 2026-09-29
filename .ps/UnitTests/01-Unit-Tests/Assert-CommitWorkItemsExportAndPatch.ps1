@@ -21,7 +21,7 @@ function Assert-CommitWorkItemsExportAndPatch () {
         4. Write the patch beside the JSON and assert the commit hash is present.
 
     .EXAMPLE
-        PS> Assert-CommitWorkItemsExportAndPatch -repoPath 'C:\repo\tests\20260923-2300' -exportTempPath 'C:\repo\tests\20260923-2300'
+        PS> Assert-CommitWorkItemsExportAndPatch -repoPath 'C:/repo/tests/20260923-2300' -exportTempPath 'C:/repo/tests/20260923-2300'
         Commits the work-item message and checks the JSON and patch files.
 
         PS> Assert-CommitWorkItemsExportAndPatch -repoPath $resolvedRepoPath -exportTempPath $exportTempPath
@@ -62,8 +62,10 @@ function Assert-CommitWorkItemsExportAndPatch () {
         $workExport = Export-GitBranchCommitByID -path $repoPath -branch main -shortHash $workCommit.Short -fetch:$false -includePatch:$false -outputPath $workJsonPath
         Write-Host 'Export-GitBranchCommitByID work-item JSON is in the dated test folder' -ForegroundColor Cyan
         Assert-TestTrue -condition ($workExport.JsonPath.StartsWith($exportTempPath, [System.StringComparison]::OrdinalIgnoreCase)) -label 'Export-GitBranchCommitByID work-item JSON is in the dated test folder' -details $workExport.JsonPath
+
         Write-Host 'work-item JSON name starts with the commit short hash' -ForegroundColor Cyan
         Assert-TestTrue -condition ([System.IO.Path]::GetFileName($workExport.JsonPath) -eq ('{0}-work-items.json' -f $workCommit.Short)) -label 'work-item JSON name starts with the commit short hash' -details $workExport.JsonPath
+
         $workJson = Get-Content -LiteralPath $workExport.JsonPath -Raw | ConvertFrom-Json
         [string]$exportedWorkItems = (@($workJson.Commit.WorkItems) -join ',')
         Write-Host 'Export JSON includes the WorkItems array' -ForegroundColor Cyan
@@ -75,8 +77,10 @@ function Assert-CommitWorkItemsExportAndPatch () {
         [System.IO.File]::WriteAllText($workPatchPath, ([string]$workPatchCommit.Patch + "`n"), $utf8NoBom)
         Write-Host 'work-item patch file is in the dated test folder' -ForegroundColor Cyan
         Assert-TestTrue -condition (Test-Path -LiteralPath $workPatchPath) -label 'work-item patch file is in the dated test folder' -details $workPatchPath
+
         Write-Host 'work-item patch name starts with the commit short hash' -ForegroundColor Cyan
         Assert-TestTrue -condition ([System.IO.Path]::GetFileName($workPatchPath) -eq ('{0}-work-items.patch' -f $workCommit.Short)) -label 'work-item patch name starts with the commit short hash' -details $workPatchPath
+
         Write-Host 'work-item patch contains the commit hash' -ForegroundColor Cyan
         Assert-TestTrue -condition ((Get-Content -LiteralPath $workPatchPath -Raw).Contains($workCommit.Hash)) -label 'work-item patch contains the commit hash'
     }

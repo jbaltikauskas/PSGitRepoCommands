@@ -18,7 +18,7 @@ function Assert-LatestCommitsOnDbUpMain () {
         4. Return the full hash of main.
 
     .EXAMPLE
-        PS> Assert-LatestCommitsOnDbUpMain -libraryPath 'C:\repo\tests\Github\DbUp'
+        PS> Assert-LatestCommitsOnDbUpMain -libraryPath 'C:/repo/tests/Github/DbUp'
         Asserts the latest-20 list and returns the main tip hash.
 
         PS> $branchTip = Assert-LatestCommitsOnDbUpMain -libraryPath $libraryPath
@@ -46,18 +46,23 @@ function Assert-LatestCommitsOnDbUpMain () {
         $olderLatest = @($latest.Commits)[1]
         Write-Host 'Get-GitBranchCommitByID returns the default limit of 20' -ForegroundColor Cyan
         Assert-TestTrue -condition ($latest.CommitCount -eq 20) -label 'Get-GitBranchCommitByID returns the default limit of 20' -details $latest.CommitCount
+
         Write-Host 'commit lookup Limit is 20' -ForegroundColor Cyan
         Assert-TestTrue -condition ($latest.Limit -eq 20) -label 'commit lookup Limit is 20'
+
         Write-Host 'branch commits are newest first' -ForegroundColor Cyan
         Assert-TestTrue -condition ([datetime]$latestTip.AuthorDate -ge [datetime]$olderLatest.AuthorDate) -label 'branch commits are newest first'
+
         Write-Host 'commit number 1 in the list is the branch tip' -ForegroundColor Cyan
         Assert-TestTrue -condition ($latestTip.Number -eq 1 -and $latestTip.Hash -eq $branchTip) -label 'commit number 1 in the list is the branch tip'
+
         Write-Host 'latest tip identity matches Robert Wagner' -ForegroundColor Cyan
         Assert-TestTrue -condition ($latestTip.Author -eq 'Robert Wagner' -and $latestTip.AuthorEmail -eq 'robert@wagner.id.au' -and $latestTip.AuthorDate -eq '2026-02-18T13:55:32+10:00' -and $latestTip.Committer -eq 'Robert Wagner') -label 'latest tip identity matches Robert Wagner'
 
         $limited = Get-GitBranchCommitByID -path $libraryPath -branch main -limit 3 -fetch:$false -includePatch:$false
         Write-Host 'Get-GitBranchCommitByID -limit 3 returns three commits' -ForegroundColor Cyan
         Assert-TestTrue -condition ($limited.CommitCount -eq 3 -and $limited.Limit -eq 3) -label 'Get-GitBranchCommitByID -limit 3 returns three commits'
+
         Write-Host '-limit 3 still starts at the branch tip' -ForegroundColor Cyan
         Assert-TestTrue -condition (@($limited.Commits)[0].Hash -eq $branchTip) -label '-limit 3 still starts at the branch tip'
 

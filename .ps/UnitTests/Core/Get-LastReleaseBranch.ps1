@@ -17,7 +17,7 @@ function Get-LastReleaseBranch () {
         3. Return the first unique name, or throw.
 
     .EXAMPLE
-        PS> Get-LastReleaseBranch -path '.\tests\Github\DbUp'
+        PS> Get-LastReleaseBranch -path './tests/Github/DbUp'
         Returns release/6.0.0 when that is the newest release branch.
 
         PS> $name = Get-LastReleaseBranch -path $libraryPath

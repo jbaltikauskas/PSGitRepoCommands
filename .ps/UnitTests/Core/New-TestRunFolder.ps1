@@ -18,8 +18,8 @@ function New-TestRunFolder () {
         3. Create the folder and return its full path.
 
     .EXAMPLE
-        PS> New-TestRunFolder -parentPath '.\tests'
-        Creates tests\20260921-0013 (or similar) and returns that path.
+        PS> New-TestRunFolder -parentPath './tests'
+        Creates tests/20260921-0013 (or similar) and returns that path.
 
         PS> $run = New-TestRunFolder -parentPath $repoPath
         Stores the dated run folder path in $run.

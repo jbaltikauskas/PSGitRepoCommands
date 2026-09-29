@@ -21,7 +21,7 @@ function Assert-CommitsByAuthorOrEmailOnSmokeRepository () {
         4. Return the newest matching commit.
 
     .EXAMPLE
-        PS> Assert-CommitsByAuthorOrEmailOnSmokeRepository -repoPath 'C:\repo\tests\20260923-2300' -exportTempPath 'C:\repo\tests\20260923-2300'
+        PS> Assert-CommitsByAuthorOrEmailOnSmokeRepository -repoPath 'C:/repo/tests/20260923-2300' -exportTempPath 'C:/repo/tests/20260923-2300'
         Asserts author and email lookup and returns the newest commit.
 
         PS> $newest = Assert-CommitsByAuthorOrEmailOnSmokeRepository -repoPath $resolvedRepoPath -exportTempPath $exportTempPath
@@ -50,11 +50,14 @@ function Assert-CommitsByAuthorOrEmailOnSmokeRepository () {
         $byAuthor = Get-GitBranchCommitsByAuthorOrEmail -path $repoPath -branch main -author 'test' -fetch:$false -includePatch:$false
         Write-Host 'Get-GitBranchCommitsByAuthorOrEmail -author finds commits' -ForegroundColor Cyan
         Assert-TestTrue -condition ($byAuthor.CommitCount -ge 2) -label 'Get-GitBranchCommitsByAuthorOrEmail -author finds commits' -details $byAuthor.CommitCount
+
         $newestAuthorCommit = @($byAuthor.Commits)[0]
         Write-Host 'author commit 1 is the newest match' -ForegroundColor Cyan
         Assert-TestTrue -condition ($newestAuthorCommit.Number -eq 1) -label 'author commit 1 is the newest match'
+
         Write-Host 'author commit Author is test' -ForegroundColor Cyan
         Assert-TestTrue -condition ($newestAuthorCommit.Author -eq 'test') -label 'author commit Author is test'
+
         Write-Host 'author commit email is test@example.com' -ForegroundColor Cyan
         Assert-TestTrue -condition ($newestAuthorCommit.AuthorEmail -eq 'test@example.com') -label 'author commit email is test@example.com'
 
@@ -70,6 +73,7 @@ function Assert-CommitsByAuthorOrEmailOnSmokeRepository () {
         $authorExport = Export-GitBranchCommitsByAuthorOrEmail -path $repoPath -branch main -author 'test' -fetch:$false -includePatch:$false -outputPath $authorJsonPath
         Write-Host 'Export-GitBranchCommitsByAuthorOrEmail JSON is in the dated test folder' -ForegroundColor Cyan
         Assert-TestTrue -condition ($authorExport.JsonPath.StartsWith($exportTempPath, [System.StringComparison]::OrdinalIgnoreCase)) -label 'Export-GitBranchCommitsByAuthorOrEmail JSON is in the dated test folder' -details $authorExport.JsonPath
+
         Write-Host 'author export CommitCount matches the lookup' -ForegroundColor Cyan
         Assert-TestTrue -condition ($authorExport.CommitCount -eq $byAuthor.CommitCount) -label 'author export CommitCount matches the lookup'
 

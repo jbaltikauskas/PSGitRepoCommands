@@ -20,7 +20,7 @@ function Export-GitBranchFullDiff () {
         PS> Export-GitBranchFullDiff -baseBranch main -targetBranch feature/foo
         Writes a timestamped JSON file under the repo and returns .JsonPath.
 
-        PS> Export-GitBranchFullDiff -baseBranch main -targetBranch qa -direction Both -outputPath '.\reports\diff.json' -includePatch
+        PS> Export-GitBranchFullDiff -baseBranch main -targetBranch qa -direction Both -outputPath './reports/diff.json' -includePatch
         Exports tip + commits (with patches) to a chosen JSON path.
 
     #>

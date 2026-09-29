@@ -21,7 +21,7 @@ function Assert-DbUpMainTipByNumberShortHashAndFullHash () {
         3. Return the commit selected by number.
 
     .EXAMPLE
-        PS> Assert-DbUpMainTipByNumberShortHashAndFullHash -libraryPath 'C:\repo\tests\Github\DbUp' -branchTip $hash
+        PS> Assert-DbUpMainTipByNumberShortHashAndFullHash -libraryPath 'C:/repo/tests/Github/DbUp' -branchTip $hash
         Asserts number, short-hash, and full-hash selection of the main tip.
 
         PS> $byNumber = Assert-DbUpMainTipByNumberShortHashAndFullHash -libraryPath $libraryPath -branchTip $branchTip
@@ -50,12 +50,16 @@ function Assert-DbUpMainTipByNumberShortHashAndFullHash () {
         $byNumber = Get-GitBranchCommitByID -path $libraryPath -branch main -number 1 -fetch:$false -includePatch:$false
         Write-Host 'Get-GitBranchCommitByID -number 1 is the branch tip' -ForegroundColor Cyan
         Assert-TestTrue -condition ($byNumber.Hash -eq $branchTip) -label 'Get-GitBranchCommitByID -number 1 is the branch tip'
+
         Write-Host 'tip Author is Robert Wagner' -ForegroundColor Cyan
         Assert-TestTrue -condition ($byNumber.Author -eq 'Robert Wagner') -label 'tip Author is Robert Wagner'
+
         Write-Host 'tip AuthorEmail is robert@wagner.id.au' -ForegroundColor Cyan
         Assert-TestTrue -condition ($byNumber.AuthorEmail -eq 'robert@wagner.id.au') -label 'tip AuthorEmail is robert@wagner.id.au'
+
         Write-Host 'tip AuthorDate is 2026-02-18T13:55:32+10:00' -ForegroundColor Cyan
         Assert-TestTrue -condition ($byNumber.AuthorDate -eq '2026-02-18T13:55:32+10:00') -label 'tip AuthorDate is 2026-02-18T13:55:32+10:00'
+
         Write-Host 'tip Committer is Robert Wagner' -ForegroundColor Cyan
         Assert-TestTrue -condition ($byNumber.Committer -eq 'Robert Wagner') -label 'tip Committer is Robert Wagner'
 

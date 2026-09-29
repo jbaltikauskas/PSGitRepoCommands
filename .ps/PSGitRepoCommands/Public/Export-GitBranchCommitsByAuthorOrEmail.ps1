@@ -19,7 +19,7 @@ function Export-GitBranchCommitsByAuthorOrEmail () {
         PS> Export-GitBranchCommitsByAuthorOrEmail -branch main -author 'Jane'
         Writes a timestamped JSON file under the repo and returns .JsonPath.
 
-        PS> Export-GitBranchCommitsByAuthorOrEmail -branch main -email jane@example.com -limit 5 -outputPath .\reports\commits.json -includePatch:$false
+        PS> Export-GitBranchCommitsByAuthorOrEmail -branch main -email jane@example.com -limit 5 -outputPath ./reports/commits.json -includePatch:$false
         Writes the latest 5 commits, without patch text, to the chosen JSON path.
 
     #>

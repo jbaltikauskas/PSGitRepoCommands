@@ -32,7 +32,7 @@ function Export-CommitsForEighteenthOfFebruaryByAuthor () {
         3. Assert the JSON stores the real DbUp tip identity.
 
     .EXAMPLE
-        PS> Export-CommitsForEighteenthOfFebruaryByAuthor -libraryPath 'C:\repo\tests\Github\DbUp' -exportFolder 'C:\repo\tests\20260923-2300' -rangeFrom $from -rangeTo $to -dateTip $tip -authorCommitCount 1
+        PS> Export-CommitsForEighteenthOfFebruaryByAuthor -libraryPath 'C:/repo/tests/Github/DbUp' -exportFolder 'C:/repo/tests/20260923-2300' -rangeFrom $from -rangeTo $to -dateTip $tip -authorCommitCount 1
         Writes the date-range JSON and asserts the tip identity.
 
         PS> Export-CommitsForEighteenthOfFebruaryByAuthor -libraryPath $libraryPath -exportFolder $exportFolder -rangeFrom $onDate.RangeFrom -rangeTo $onDate.RangeTo -dateTip $onDate.DateTip -authorCommitCount $byAuthor.CommitCount
@@ -75,10 +75,13 @@ function Export-CommitsForEighteenthOfFebruaryByAuthor () {
         $dateExport = Export-GitBranchCommitsByDateRange -path $libraryPath -branch main -from $rangeFrom -to $rangeTo -author 'Robert Wagner' -fetch:$false -includePatch:$false -outputPath $dateJsonPath
         Write-Host 'Export-GitBranchCommitsByDateRange wrote JSON' -ForegroundColor Cyan
         Assert-TestTrue -condition (Test-Path -LiteralPath $dateExport.JsonPath) -label 'Export-GitBranchCommitsByDateRange wrote JSON' -details $dateExport.JsonPath
+
         Write-Host 'date export JSON is in the dated test folder' -ForegroundColor Cyan
         Assert-TestTrue -condition ($dateExport.JsonPath.StartsWith($exportFolder, [System.StringComparison]::OrdinalIgnoreCase)) -label 'date export JSON is in the dated test folder' -details $dateExport.JsonPath
+
         Write-Host 'date export CommitCount matches the author filter' -ForegroundColor Cyan
         Assert-TestTrue -condition ($dateExport.CommitCount -eq $authorCommitCount) -label 'date export CommitCount matches the author filter'
+
         $exportJson = Get-Content -LiteralPath $dateExport.JsonPath -Raw | ConvertFrom-Json
         $exportTip = @($exportJson.Commits)[0]
         Write-Host 'date export JSON stores the real DbUp tip identity' -ForegroundColor Cyan

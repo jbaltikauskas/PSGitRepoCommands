@@ -16,7 +16,7 @@ function Assert-GitBranchReadCmdletsOnSmokeRepository () {
         3. Assert main exists and a missing name does not.
 
     .EXAMPLE
-        PS> Assert-GitBranchReadCmdletsOnSmokeRepository -repoPath 'C:\repo\tests\20260923-2300'
+        PS> Assert-GitBranchReadCmdletsOnSmokeRepository -repoPath 'C:/repo/tests/20260923-2300'
         Checks current branch, list, and exists on that root.
 
         PS> Assert-GitBranchReadCmdletsOnSmokeRepository -repoPath $resolvedRepoPath
@@ -41,6 +41,7 @@ function Assert-GitBranchReadCmdletsOnSmokeRepository () {
         $current = Get-GitCurrentBranch -path $repoPath
         Write-Host 'Get-GitCurrentBranch is main' -ForegroundColor Cyan
         Assert-TestTrue -condition ($current.Name -eq 'main') -label 'Get-GitCurrentBranch is main'
+
         Write-Host 'Get-GitCurrentBranch.IsCurrent' -ForegroundColor Cyan
         Assert-TestTrue -condition ($current.IsCurrent -eq $true) -label 'Get-GitCurrentBranch.IsCurrent'
 

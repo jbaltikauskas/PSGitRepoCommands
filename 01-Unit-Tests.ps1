@@ -17,7 +17,7 @@
        The DbUp submodule under tests/Github/ is left untouched.
 
 .PARAMETER modulePath
-    Path to PSGitRepoCommands.psd1. Defaults to .ps\PSGitRepoCommands\PSGitRepoCommands.psd1
+    Path to PSGitRepoCommands.psd1. Defaults to .ps/PSGitRepoCommands/PSGitRepoCommands.psd1
     under the script root.
 
 .PARAMETER repoPath
@@ -42,10 +42,10 @@
     dated folder under tests/ (yyyyMMdd-HHmm), not the parent PSGitRepoCommands repo.
 
 .EXAMPLE
-    PS> .\Unit-Tests.ps1
-    Imports PSGitRepoCommands and runs the suite in tests\yyyyMMdd-HHmm.
+    PS> ./Unit-Tests.ps1
+    Imports PSGitRepoCommands and runs the suite in tests/yyyyMMdd-HHmm.
 
-    PS> .\Unit-Tests.ps1 -noPause
+    PS> ./Unit-Tests.ps1 -noPause
     Same suite without Read-Host pauses (CI / agent friendly).
 #>
 

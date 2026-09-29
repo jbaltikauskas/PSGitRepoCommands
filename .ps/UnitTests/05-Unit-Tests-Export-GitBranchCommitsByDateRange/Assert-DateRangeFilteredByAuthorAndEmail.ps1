@@ -27,7 +27,7 @@ function Assert-DateRangeFilteredByAuthorAndEmail () {
         4. Return the author-filtered lookup.
 
     .EXAMPLE
-        PS> Assert-DateRangeFilteredByAuthorAndEmail -libraryPath 'C:\repo\tests\Github\DbUp' -rangeFrom $from -rangeTo $to -dateTip $tip
+        PS> Assert-DateRangeFilteredByAuthorAndEmail -libraryPath 'C:/repo/tests/Github/DbUp' -rangeFrom $from -rangeTo $to -dateTip $tip
         Asserts the author and email filters and returns the author lookup.
 
         PS> $byAuthor = Assert-DateRangeFilteredByAuthorAndEmail -libraryPath $libraryPath -rangeFrom $onDate.RangeFrom -rangeTo $onDate.RangeTo -dateTip $onDate.DateTip
@@ -63,6 +63,7 @@ function Assert-DateRangeFilteredByAuthorAndEmail () {
         $authorTip = @($byAuthor.Commits)[0]
         Write-Host 'author filter keeps the same newest commit' -ForegroundColor Cyan
         Assert-TestTrue -condition ($authorTip.Hash -eq $dateTip.Hash) -label 'author filter keeps the same newest commit'
+
         Write-Host 'date lookup stores the author filter' -ForegroundColor Cyan
         Assert-TestTrue -condition ($byAuthor.Author -eq 'Robert Wagner') -label 'date lookup stores the author filter'
 
@@ -70,6 +71,7 @@ function Assert-DateRangeFilteredByAuthorAndEmail () {
         $emailTip = @($byEmail.Commits)[0]
         Write-Host 'email filter keeps the same newest commit' -ForegroundColor Cyan
         Assert-TestTrue -condition ($emailTip.Hash -eq $dateTip.Hash) -label 'email filter keeps the same newest commit'
+
         Write-Host 'date lookup stores the email filter' -ForegroundColor Cyan
         Assert-TestTrue -condition ($byEmail.Email -eq 'robert@wagner.id.au') -label 'date lookup stores the email filter'
 

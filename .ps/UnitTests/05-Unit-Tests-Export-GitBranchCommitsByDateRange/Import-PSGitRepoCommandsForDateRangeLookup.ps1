@@ -15,7 +15,7 @@ function Import-PSGitRepoCommandsForDateRangeLookup () {
         2. Assert the date-range commands are exported.
 
     .EXAMPLE
-        PS> Import-PSGitRepoCommandsForDateRangeLookup -modulePath 'C:\repo\.ps\PSGitRepoCommands\PSGitRepoCommands.psd1'
+        PS> Import-PSGitRepoCommandsForDateRangeLookup -modulePath 'C:/repo/.ps/PSGitRepoCommands/PSGitRepoCommands.psd1'
         Imports the module and asserts the date-range commands.
 
         PS> Import-PSGitRepoCommandsForDateRangeLookup -modulePath $resolvedModulePath

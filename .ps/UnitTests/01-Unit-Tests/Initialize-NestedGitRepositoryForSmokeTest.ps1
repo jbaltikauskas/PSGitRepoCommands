@@ -16,7 +16,7 @@ function Initialize-NestedGitRepositoryForSmokeTest () {
         2. Print the resolved root and return it.
 
     .EXAMPLE
-        PS> Initialize-NestedGitRepositoryForSmokeTest -repoPath 'C:\repo\tests\20260923-2300'
+        PS> Initialize-NestedGitRepositoryForSmokeTest -repoPath 'C:/repo/tests/20260923-2300'
         Creates the nested Git root and returns its full path.
 
         PS> $resolvedRepoPath = Initialize-NestedGitRepositoryForSmokeTest -repoPath $runFolder

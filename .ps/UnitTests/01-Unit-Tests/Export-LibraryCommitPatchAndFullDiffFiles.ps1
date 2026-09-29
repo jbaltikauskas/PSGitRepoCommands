@@ -37,7 +37,7 @@ function Export-LibraryCommitPatchAndFullDiffFiles () {
         4. Assert the diff patch name and that the file is not empty.
 
     .EXAMPLE
-        PS> Export-LibraryCommitPatchAndFullDiffFiles -libraryPath 'C:\repo\tests\Github\DbUp' -exportTempPath 'C:\repo\tests\20260923-2300' -releaseBranch 'release/1.0' -diffTargetBranch 'main' -branchTip $tipHash -byNumber $commit -tip $diff
+        PS> Export-LibraryCommitPatchAndFullDiffFiles -libraryPath 'C:/repo/tests/Github/DbUp' -exportTempPath 'C:/repo/tests/20260923-2300' -releaseBranch 'release/1.0' -diffTargetBranch 'main' -branchTip $tipHash -byNumber $commit -tip $diff
         Writes the commit and diff JSON and patch files into the dated folder.
 
         PS> Export-LibraryCommitPatchAndFullDiffFiles -libraryPath $fullDiff.LibraryPath -exportTempPath $exportTempPath -releaseBranch $fullDiff.ReleaseBranch -diffTargetBranch $fullDiff.DiffTargetBranch -branchTip $selectedTip.BranchTip -byNumber $selectedTip.ByNumber -tip $fullDiff.Tip
@@ -89,10 +89,13 @@ function Export-LibraryCommitPatchAndFullDiffFiles () {
         $commitExport = Export-GitBranchCommitByID -path $libraryPath -branch $diffTargetBranch -shortHash $byNumber.Short -fetch:$false -includePatch:$false -outputPath $commitJsonPath
         Write-Host 'Export-GitBranchCommitByID wrote JSON' -ForegroundColor Cyan
         Assert-TestTrue -condition (Test-Path -LiteralPath $commitExport.JsonPath) -label 'Export-GitBranchCommitByID wrote JSON'
+
         Write-Host 'Export-GitBranchCommitByID JSON is in the dated test folder' -ForegroundColor Cyan
         Assert-TestTrue -condition ($commitExport.JsonPath.StartsWith($exportTempPath, [System.StringComparison]::OrdinalIgnoreCase)) -label 'Export-GitBranchCommitByID JSON is in the dated test folder' -details $commitExport.JsonPath
+
         Write-Host 'commit export JSON name starts with the commit short hash' -ForegroundColor Cyan
         Assert-TestTrue -condition ([System.IO.Path]::GetFileName($commitExport.JsonPath) -eq ('{0}-commit-export.json' -f $byNumber.Short)) -label 'commit export JSON name starts with the commit short hash' -details $commitExport.JsonPath
+
         Write-Host 'Export-GitBranchCommitByID commit is the branch tip' -ForegroundColor Cyan
         Assert-TestTrue -condition ($commitExport.Commit.Hash -eq $branchTip) -label 'Export-GitBranchCommitByID commit is the branch tip'
 
@@ -101,8 +104,10 @@ function Export-LibraryCommitPatchAndFullDiffFiles () {
         [System.IO.File]::WriteAllText($commitPatchPath, ([string]$commitPatch.Patch + "`n"), $utf8NoBom)
         Write-Host 'commit patch file is in the dated test folder' -ForegroundColor Cyan
         Assert-TestTrue -condition (Test-Path -LiteralPath $commitPatchPath) -label 'commit patch file is in the dated test folder' -details $commitPatchPath
+
         Write-Host 'commit patch name starts with the commit short hash' -ForegroundColor Cyan
         Assert-TestTrue -condition ([System.IO.Path]::GetFileName($commitPatchPath) -eq ('{0}-commit-export.patch' -f $byNumber.Short)) -label 'commit patch name starts with the commit short hash' -details $commitPatchPath
+
         Write-Host 'commit patch contains the commit hash' -ForegroundColor Cyan
         Assert-TestTrue -condition ((Get-Content -LiteralPath $commitPatchPath -Raw).Contains($byNumber.Hash)) -label 'commit patch contains the commit hash'
 
@@ -110,8 +115,10 @@ function Export-LibraryCommitPatchAndFullDiffFiles () {
         $export = Export-GitBranchFullDiff -path $libraryPath -baseBranch $releaseBranch -targetBranch $diffTargetBranch -direction TargetAhead -outputPath $jsonPath
         Write-Host 'Export-GitBranchFullDiff wrote JSON' -ForegroundColor Cyan
         Assert-TestTrue -condition (Test-Path -LiteralPath $export.JsonPath) -label 'Export-GitBranchFullDiff wrote JSON'
+
         Write-Host 'Export-GitBranchFullDiff JSON is in the dated test folder' -ForegroundColor Cyan
         Assert-TestTrue -condition ($export.JsonPath.StartsWith($exportTempPath, [System.StringComparison]::OrdinalIgnoreCase)) -label 'Export-GitBranchFullDiff JSON is in the dated test folder' -details $export.JsonPath
+
         Write-Host 'diff export JSON name starts with the target tip short hash' -ForegroundColor Cyan
         Assert-TestTrue -condition ([System.IO.Path]::GetFileName($export.JsonPath) -eq ('{0}-diff-export.json' -f $byNumber.Short)) -label 'diff export JSON name starts with the target tip short hash' -details $export.JsonPath
 
@@ -119,8 +126,10 @@ function Export-LibraryCommitPatchAndFullDiffFiles () {
         [System.IO.File]::WriteAllText($diffPatchPath, ([string]$tip.Patch + "`n"), $utf8NoBom)
         Write-Host 'diff patch file is in the dated test folder' -ForegroundColor Cyan
         Assert-TestTrue -condition (Test-Path -LiteralPath $diffPatchPath) -label 'diff patch file is in the dated test folder' -details $diffPatchPath
+
         Write-Host 'diff patch name starts with the target tip short hash' -ForegroundColor Cyan
         Assert-TestTrue -condition ([System.IO.Path]::GetFileName($diffPatchPath) -eq ('{0}-diff-export.patch' -f $byNumber.Short)) -label 'diff patch name starts with the target tip short hash' -details $diffPatchPath
+
         Write-Host 'diff patch file is not empty' -ForegroundColor Cyan
         Assert-TestTrue -condition ((Get-Item -LiteralPath $diffPatchPath).Length -gt 0) -label 'diff patch file is not empty'
     }

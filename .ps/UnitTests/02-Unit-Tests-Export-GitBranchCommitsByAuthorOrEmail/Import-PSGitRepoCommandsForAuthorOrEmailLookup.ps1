@@ -15,7 +15,7 @@ function Import-PSGitRepoCommandsForAuthorOrEmailLookup () {
         2. Assert the author-or-email commands are exported.
 
     .EXAMPLE
-        PS> Import-PSGitRepoCommandsForAuthorOrEmailLookup -modulePath 'C:\repo\.ps\PSGitRepoCommands\PSGitRepoCommands.psd1'
+        PS> Import-PSGitRepoCommandsForAuthorOrEmailLookup -modulePath 'C:/repo/.ps/PSGitRepoCommands/PSGitRepoCommands.psd1'
         Imports the module and asserts the author-or-email commands.
 
         PS> Import-PSGitRepoCommandsForAuthorOrEmailLookup -modulePath $resolvedModulePath

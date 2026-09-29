@@ -26,7 +26,7 @@ function Export-CommitsByAuthorRobertWagner () {
         3. Assert the JSON stores the real DbUp tip identity.
 
     .EXAMPLE
-        PS> Export-CommitsByAuthorRobertWagner -libraryPath 'C:\repo\tests\Github\DbUp' -exportFolder 'C:\repo\tests\20260923-2300' -authorTip $tip -authorCommitCount 20
+        PS> Export-CommitsByAuthorRobertWagner -libraryPath 'C:/repo/tests/Github/DbUp' -exportFolder 'C:/repo/tests/20260923-2300' -authorTip $tip -authorCommitCount 20
         Writes the author JSON and asserts the tip identity.
 
         PS> Export-CommitsByAuthorRobertWagner -libraryPath $libraryPath -exportFolder $exportFolder -authorTip $authorTip -authorCommitCount $byAuthor.CommitCount
@@ -63,10 +63,13 @@ function Export-CommitsByAuthorRobertWagner () {
         $authorExport = Export-GitBranchCommitsByAuthorOrEmail -path $libraryPath -branch main -author 'Robert Wagner' -fetch:$false -outputPath $authorJsonPath
         Write-Host 'Export-GitBranchCommitsByAuthorOrEmail wrote JSON' -ForegroundColor Cyan
         Assert-TestTrue -condition (Test-Path -LiteralPath $authorExport.JsonPath) -label 'Export-GitBranchCommitsByAuthorOrEmail wrote JSON' -details $authorExport.JsonPath
+
         Write-Host 'author export JSON is in the dated test folder' -ForegroundColor Cyan
         Assert-TestTrue -condition ($authorExport.JsonPath.StartsWith($exportFolder, [System.StringComparison]::OrdinalIgnoreCase)) -label 'author export JSON is in the dated test folder' -details $authorExport.JsonPath
+
         Write-Host 'author export CommitCount matches the author lookup' -ForegroundColor Cyan
         Assert-TestTrue -condition ($authorExport.CommitCount -eq $authorCommitCount) -label 'author export CommitCount matches the author lookup'
+
         $exportJson = Get-Content -LiteralPath $authorExport.JsonPath -Raw | ConvertFrom-Json
         $exportTip = @($exportJson.Commits)[0]
         Write-Host 'author export JSON stores the real DbUp tip identity' -ForegroundColor Cyan

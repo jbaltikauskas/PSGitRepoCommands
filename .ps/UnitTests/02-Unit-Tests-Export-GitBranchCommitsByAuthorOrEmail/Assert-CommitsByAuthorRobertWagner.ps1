@@ -17,7 +17,7 @@ function Assert-CommitsByAuthorRobertWagner () {
         3. Return the lookup result.
 
     .EXAMPLE
-        PS> Assert-CommitsByAuthorRobertWagner -libraryPath 'C:\repo\tests\Github\DbUp'
+        PS> Assert-CommitsByAuthorRobertWagner -libraryPath 'C:/repo/tests/Github/DbUp'
         Asserts the Robert Wagner author lookup and returns it.
 
         PS> $byAuthor = Assert-CommitsByAuthorRobertWagner -libraryPath $libraryPath
@@ -43,19 +43,26 @@ function Assert-CommitsByAuthorRobertWagner () {
         $authorTip = @($byAuthor.Commits)[0]
         Write-Host 'Get-GitBranchCommitsByAuthorOrEmail -author returns the default limit of 20' -ForegroundColor Cyan
         Assert-TestTrue -condition ($byAuthor.CommitCount -eq 20) -label 'Get-GitBranchCommitsByAuthorOrEmail -author returns the default limit of 20' -details $byAuthor.CommitCount
+
         Write-Host 'author lookup Limit is 20' -ForegroundColor Cyan
         Assert-TestTrue -condition ($byAuthor.Limit -eq 20) -label 'author lookup Limit is 20'
+
         $olderAuthorCommit = @($byAuthor.Commits)[1]
         Write-Host 'author commits are newest first' -ForegroundColor Cyan
         Assert-TestTrue -condition ([datetime]$authorTip.AuthorDate -ge [datetime]$olderAuthorCommit.AuthorDate) -label 'author commits are newest first'
+
         Write-Host 'author lookup Author is Robert Wagner' -ForegroundColor Cyan
         Assert-TestTrue -condition ($authorTip.Author -eq 'Robert Wagner') -label 'author lookup Author is Robert Wagner'
+
         Write-Host 'author lookup AuthorEmail is robert@wagner.id.au' -ForegroundColor Cyan
         Assert-TestTrue -condition ($authorTip.AuthorEmail -eq 'robert@wagner.id.au') -label 'author lookup AuthorEmail is robert@wagner.id.au'
+
         Write-Host 'author lookup AuthorDate is 2026-02-18T13:55:32+10:00' -ForegroundColor Cyan
         Assert-TestTrue -condition ($authorTip.AuthorDate -eq '2026-02-18T13:55:32+10:00') -label 'author lookup AuthorDate is 2026-02-18T13:55:32+10:00'
+
         Write-Host 'author lookup Committer is Robert Wagner' -ForegroundColor Cyan
         Assert-TestTrue -condition ($authorTip.Committer -eq 'Robert Wagner') -label 'author lookup Committer is Robert Wagner'
+
         Write-Host 'author lookup includes patch text' -ForegroundColor Cyan
         Assert-TestTrue -condition ($byAuthor.IncludePatch -eq $true) -label 'author lookup includes patch text'
 

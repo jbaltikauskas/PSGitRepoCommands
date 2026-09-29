@@ -19,7 +19,7 @@ function Initialize-TestGitRepository () {
         4. Assert show-toplevel equals RepoPath; return it.
 
     .EXAMPLE
-        PS> Initialize-TestGitRepository -repoPath '.\tests'
+        PS> Initialize-TestGitRepository -repoPath './tests'
         Makes tests/ a nested Git root with main and feature/x.
 
         PS> $root = Initialize-TestGitRepository -repoPath $repoPath

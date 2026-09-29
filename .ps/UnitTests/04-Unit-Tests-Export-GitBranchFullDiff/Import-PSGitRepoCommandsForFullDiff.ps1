@@ -15,7 +15,7 @@ function Import-PSGitRepoCommandsForFullDiff () {
         2. Assert Export-GitBranchFullDiff is exported.
 
     .EXAMPLE
-        PS> Import-PSGitRepoCommandsForFullDiff -modulePath 'C:\repo\.ps\PSGitRepoCommands\PSGitRepoCommands.psd1'
+        PS> Import-PSGitRepoCommandsForFullDiff -modulePath 'C:/repo/.ps/PSGitRepoCommands/PSGitRepoCommands.psd1'
         Imports the module and asserts the full-diff export command.
 
         PS> Import-PSGitRepoCommandsForFullDiff -modulePath $resolvedModulePath

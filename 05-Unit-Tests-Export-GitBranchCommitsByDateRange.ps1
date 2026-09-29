@@ -13,7 +13,7 @@
        The DbUp submodule under tests/Github/ is left untouched.
 
 .PARAMETER modulePath
-    Path to PSGitRepoCommands.psd1. Defaults to .ps\PSGitRepoCommands\PSGitRepoCommands.psd1
+    Path to PSGitRepoCommands.psd1. Defaults to .ps/PSGitRepoCommands/PSGitRepoCommands.psd1
     under the script root.
 
 .PARAMETER repoPath
@@ -38,10 +38,10 @@
     only into the dated folder under tests/.
 
 .EXAMPLE
-    PS> .\05-Unit-Tests-Export-GitBranchCommitsByDateRange.ps1
-    Imports PSGitRepoCommands and writes the 2026-02-18 export under tests\yyyyMMdd-HHmm.
+    PS> ./05-Unit-Tests-Export-GitBranchCommitsByDateRange.ps1
+    Imports PSGitRepoCommands and writes the 2026-02-18 export under tests/yyyyMMdd-HHmm.
 
-    PS> .\05-Unit-Tests-Export-GitBranchCommitsByDateRange.ps1 -noPause -keepTempRepo:$false
+    PS> ./05-Unit-Tests-Export-GitBranchCommitsByDateRange.ps1 -noPause -keepTempRepo:$false
     Same suite without Read-Host pauses, then removes the dated folder.
 #>
 

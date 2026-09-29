@@ -19,7 +19,7 @@ function Export-GitBranchCommitByID () {
         PS> Export-GitBranchCommitByID -branch main -shortHash a1b2c3d
         Writes a timestamped JSON file under the repo and returns .JsonPath.
 
-        PS> Export-GitBranchCommitByID -branch main -number 1 -outputPath '.\reports\commit.json'
+        PS> Export-GitBranchCommitByID -branch main -number 1 -outputPath './reports/commit.json'
         Writes the latest commit on main to the chosen JSON path.
 
         PS> Export-GitBranchCommitByID -branch feature/foo -hash 0123456789abcdef0123456789abcdef01234567 -includePatch:$false

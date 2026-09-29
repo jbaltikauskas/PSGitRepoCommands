@@ -23,7 +23,7 @@ function Assert-CommitsByDateRangeOnSmokeRepository () {
         3. Export the author-filtered range into the dated folder.
 
     .EXAMPLE
-        PS> Assert-CommitsByDateRangeOnSmokeRepository -repoPath 'C:\repo\tests\20260923-2300' -exportTempPath 'C:\repo\tests\20260923-2300' -newestAuthorCommit $commit
+        PS> Assert-CommitsByDateRangeOnSmokeRepository -repoPath 'C:/repo/tests/20260923-2300' -exportTempPath 'C:/repo/tests/20260923-2300' -newestAuthorCommit $commit
         Asserts the date window and writes the export JSON.
 
         PS> Assert-CommitsByDateRangeOnSmokeRepository -repoPath $resolvedRepoPath -exportTempPath $exportTempPath -newestAuthorCommit $newestAuthorCommit
@@ -59,8 +59,10 @@ function Assert-CommitsByDateRangeOnSmokeRepository () {
         $newestDateCommit = @($byDate.Commits)[0]
         Write-Host 'Get-GitBranchCommitsByDateRange finds commits in the range' -ForegroundColor Cyan
         Assert-TestTrue -condition ($byDate.CommitCount -ge 1) -label 'Get-GitBranchCommitsByDateRange finds commits in the range' -details $byDate.CommitCount
+
         Write-Host 'date range number 1 is the newest author commit' -ForegroundColor Cyan
         Assert-TestTrue -condition ($newestDateCommit.Hash -eq $newestAuthorCommit.Hash) -label 'date range number 1 is the newest author commit'
+
         Write-Host 'newest date-range commit is inside the inclusive bounds' -ForegroundColor Cyan
         Assert-TestTrue -condition ([datetime]$newestDateCommit.AuthorDate -ge $rangeFrom -and [datetime]$newestDateCommit.AuthorDate -le $rangeTo) -label 'newest date-range commit is inside the inclusive bounds'
 
@@ -84,6 +86,7 @@ function Assert-CommitsByDateRangeOnSmokeRepository () {
         $dateExport = Export-GitBranchCommitsByDateRange -path $repoPath -branch main -from $rangeFrom -to $rangeTo -author 'test' -fetch:$false -includePatch:$false -outputPath $dateJsonPath
         Write-Host 'Export-GitBranchCommitsByDateRange JSON is in the dated test folder' -ForegroundColor Cyan
         Assert-TestTrue -condition ($dateExport.JsonPath.StartsWith($exportTempPath, [System.StringComparison]::OrdinalIgnoreCase)) -label 'Export-GitBranchCommitsByDateRange JSON is in the dated test folder' -details $dateExport.JsonPath
+
         Write-Host 'date export CommitCount matches the date lookup' -ForegroundColor Cyan
         Assert-TestTrue -condition ($dateExport.CommitCount -eq $byDateAuthor.CommitCount) -label 'date export CommitCount matches the date lookup'
     }

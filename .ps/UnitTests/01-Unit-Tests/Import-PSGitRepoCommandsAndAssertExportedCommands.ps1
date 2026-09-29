@@ -17,7 +17,7 @@ function Import-PSGitRepoCommandsAndAssertExportedCommands () {
         3. Assert the minimum count and the smoke-test command names.
 
     .EXAMPLE
-        PS> Import-PSGitRepoCommandsAndAssertExportedCommands -modulePath 'C:\repo\.ps\PSGitRepoCommands\PSGitRepoCommands.psd1'
+        PS> Import-PSGitRepoCommandsAndAssertExportedCommands -modulePath 'C:/repo/.ps/PSGitRepoCommands/PSGitRepoCommands.psd1'
         Imports the module and asserts the smoke-test exports.
 
         PS> Import-PSGitRepoCommandsAndAssertExportedCommands -modulePath $resolvedModulePath
@@ -45,16 +45,22 @@ function Import-PSGitRepoCommandsAndAssertExportedCommands () {
         Write-Host ("Exported commands ({0}): {1}" -f $exported.Count, ($exported -join ', ')) -ForegroundColor DarkGray
         Write-Host 'module exports at least 19 commands' -ForegroundColor Cyan
         Assert-TestTrue -condition ($exported.Count -ge 19) -label 'module exports at least 19 commands'
+
         Write-Host 'Get-GitBranchCommitByID is exported' -ForegroundColor Cyan
         Assert-TestTrue -condition ($exported -contains 'Get-GitBranchCommitByID') -label 'Get-GitBranchCommitByID is exported'
+
         Write-Host 'Export-GitBranchCommitByID is exported' -ForegroundColor Cyan
         Assert-TestTrue -condition ($exported -contains 'Export-GitBranchCommitByID') -label 'Export-GitBranchCommitByID is exported'
+
         Write-Host 'Get-GitBranchCommitsByAuthorOrEmail is exported' -ForegroundColor Cyan
         Assert-TestTrue -condition ($exported -contains 'Get-GitBranchCommitsByAuthorOrEmail') -label 'Get-GitBranchCommitsByAuthorOrEmail is exported'
+
         Write-Host 'Export-GitBranchCommitsByAuthorOrEmail is exported' -ForegroundColor Cyan
         Assert-TestTrue -condition ($exported -contains 'Export-GitBranchCommitsByAuthorOrEmail') -label 'Export-GitBranchCommitsByAuthorOrEmail is exported'
+
         Write-Host 'Get-GitBranchCommitsByDateRange is exported' -ForegroundColor Cyan
         Assert-TestTrue -condition ($exported -contains 'Get-GitBranchCommitsByDateRange') -label 'Get-GitBranchCommitsByDateRange is exported'
+
         Write-Host 'Export-GitBranchCommitsByDateRange is exported' -ForegroundColor Cyan
         Assert-TestTrue -condition ($exported -contains 'Export-GitBranchCommitsByDateRange') -label 'Export-GitBranchCommitsByDateRange is exported'
     }

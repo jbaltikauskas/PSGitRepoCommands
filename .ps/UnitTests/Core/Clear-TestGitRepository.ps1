@@ -16,7 +16,7 @@ function Clear-TestGitRepository () {
         2. Remove the dated run folder when it exists.
 
     .EXAMPLE
-        PS> Clear-TestGitRepository -repoPath '.\tests\20260921-0013'
+        PS> Clear-TestGitRepository -repoPath './tests/20260921-0013'
         Removes that dated run folder.
 
         PS> Clear-TestGitRepository -repoPath $resolvedRepoPath

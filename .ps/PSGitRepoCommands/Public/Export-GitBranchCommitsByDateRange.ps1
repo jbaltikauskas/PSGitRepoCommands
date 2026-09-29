@@ -19,7 +19,7 @@ function Export-GitBranchCommitsByDateRange () {
         PS> Export-GitBranchCommitsByDateRange -branch main -from '2026-02-01' -to '2026-02-18'
         Writes a timestamped JSON file under the repo and returns .JsonPath.
 
-        PS> Export-GitBranchCommitsByDateRange -branch main -from '2026-02-01' -to '2026-02-18' -author 'Jane' -outputPath '.\reports\commits.json' -includePatch:$false
+        PS> Export-GitBranchCommitsByDateRange -branch main -from '2026-02-01' -to '2026-02-18' -author 'Jane' -outputPath './reports/commits.json' -includePatch:$false
         Writes the matching commits, without patch text, to the chosen JSON path.
 
         PS> Export-GitBranchCommitsByDateRange -branch main -from '2026-02-01' -to '2026-02-18' -email jane@example.com -limit 5

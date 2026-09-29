@@ -18,7 +18,7 @@ function Assert-CommitsOnEighteenthOfFebruary2026 () {
         4. Return the window and the newest commit.
 
     .EXAMPLE
-        PS> Assert-CommitsOnEighteenthOfFebruary2026 -libraryPath 'C:\repo\tests\Github\DbUp'
+        PS> Assert-CommitsOnEighteenthOfFebruary2026 -libraryPath 'C:/repo/tests/Github/DbUp'
         Asserts the 2026-02-18 window and returns the newest commit.
 
         PS> $onDate = Assert-CommitsOnEighteenthOfFebruary2026 -libraryPath $libraryPath
@@ -46,10 +46,13 @@ function Assert-CommitsOnEighteenthOfFebruary2026 () {
         $dateTip = @($byDate.Commits)[0]
         Write-Host 'Get-GitBranchCommitsByDateRange returns commits inside the default limit' -ForegroundColor Cyan
         Assert-TestTrue -condition ($byDate.CommitCount -ge 1 -and $byDate.CommitCount -le 20) -label 'Get-GitBranchCommitsByDateRange returns commits inside the default limit' -details $byDate.CommitCount
+
         Write-Host 'date lookup Limit is 20' -ForegroundColor Cyan
         Assert-TestTrue -condition ($byDate.Limit -eq 20) -label 'date lookup Limit is 20'
+
         Write-Host 'date range number 1 is the DbUp main tip' -ForegroundColor Cyan
         Assert-TestTrue -condition ($dateTip.Hash -eq '41228ce747979fb52e1a59e3eec5823e6de869c8') -label 'date range number 1 is the DbUp main tip'
+
         Write-Host 'date range tip identity matches Robert Wagner' -ForegroundColor Cyan
         Assert-TestTrue -condition ($dateTip.Author -eq 'Robert Wagner' -and $dateTip.AuthorEmail -eq 'robert@wagner.id.au' -and $dateTip.AuthorDate -eq '2026-02-18T13:55:32+10:00' -and $dateTip.Committer -eq 'Robert Wagner') -label 'date range tip identity matches Robert Wagner'
 

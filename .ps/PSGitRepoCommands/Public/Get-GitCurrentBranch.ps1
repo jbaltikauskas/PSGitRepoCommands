@@ -16,7 +16,7 @@ function Get-GitCurrentBranch () {
         PS> Get-GitCurrentBranch
         Returns a PSCustomObject with Name, Path, and IsCurrent for HEAD.
 
-        PS> (Get-GitCurrentBranch -path 'C:\repos\app').Name
+        PS> (Get-GitCurrentBranch -path 'C:/repos/app').Name
         Gets the current branch name for a specific repository path.
 
     #>
